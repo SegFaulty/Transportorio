@@ -101,6 +101,7 @@ script.on_event({defines.events.on_chunk_generated},
 )
 
 script.on_init(function()
+	global.tro_players = {}
 	-- removed crashsite and cutscene start, so on_player_created inventory safe
 	remote.call("freeplay", "set_disable_crashsite", true)  
 	
@@ -974,5 +975,35 @@ function update_map()
 	end 
 end --end function
 
+script.on_event(defines.events.on_player_joined_game, 
+	function(event)
+		local player = game.get_player(event.player_index)
 
+		global.tro_players[player.index] = { trade_menu = false }
 
+		local screen_element = player.gui.screen
+		local main_frame = screen_element.add{type="frame", name="tro_trade_button_frame"}
+
+		main_frame.add{type="button", name="tro_trade_menu_toggle", caption={"tro.trades"}}
+end)
+
+script.on_event(defines.events.on_gui_click,
+	function(event)
+		if event.element.name == "tro_trade_menu_toggle" then
+			local player = game.get_player(event.player_index)
+			local player_global = global.tro_players[player.index]
+			local screen_element = player.gui.screen
+			
+			-- create empty frame
+			if player_global.trade_menu == false then
+				local main_frame = screen_element.add{type="frame", name="tro_trade_frame"}
+
+				main_frame.style.size = {385, 165}
+				main_frame.auto_center = true
+			else
+				local main_frame = screen_element["tro_trade_frame"]
+				main_frame.destroy()
+			end
+			player_global.trade_menu = not player_global.trade_menu
+		end
+end)
