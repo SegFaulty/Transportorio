@@ -381,10 +381,6 @@ data.raw.technology["logistic-robotics"] = {
         modifier = true
       },
       {
-        type = "auto-character-logistic-trash-slots",
-        modifier = true
-      },
-      {
         type = "character-logistic-trash-slots",
         modifier = 30
       }

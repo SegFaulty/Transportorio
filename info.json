@@ -5,6 +5,6 @@
     "author": "DaveMcDave",
     "contact": "",
     "homepage": "",
-    "factorio_version": "1.0",
-    "dependencies": ["base >= 1.0"],
+    "factorio_version": "1.1",
+    "dependencies": ["base >= 1.1"],
     "description": "My take on balancing Singistics. Total conversion replacing crafting and research with randomized trade routes. Not intended to be compatible with any other mods."}
