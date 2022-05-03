@@ -1,15 +1,11 @@
---Remove power requirement
+--This script removes the power requirements for some machines
 for k, v in pairs(data.raw["assembling-machine"]) do
-
-v.energy_source ={type = "void"}
-
+	v.energy_source ={type = "void"}
 end
 
 
 for k, v in pairs(data.raw["inserter"]) do
-
-v.energy_source ={type = "void"}
-
+	v.energy_source ={type = "void"}
 end
 --remove power from spawned or placeable
 data.raw["rocket-silo"]["rocket-silo"].energy_source ={type = "void"}
