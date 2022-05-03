@@ -6,25 +6,25 @@ local debugType = "File" -- "File" to output to a .log file, "Terminal" to outpu
 
 -- Writes to the final debug output method based on type selection
 local function debugWriteType(text)
-    if debugType == "File" then
-        game.write_file("traderouteoverhaul-debug.log", text, true)
-    elseif debugType == "Terminal" then
-        log(text)
-    else
-        game.print(text)
-    end
+	if debugType == "File" then
+		game.write_file("traderouteoverhaul-debug.log", text, true)
+	elseif debugType == "Terminal" then
+		log(text)
+	else
+		game.print(text)
+	end
 end
 
 -- Debug writer for calling elsewhere in the program
 function debugWrite(text)
-    if DEBUG then
-        debugCount = debugCount + 1
-        if debugMaxCount == 0 or debugCount < debugMaxCount then
-            debugWriteType(text)
-        elseif debugCount == debugMaxCount then 
-            debugWriteType("Message count at " .. debugMaxCount .. ", logging stopped")
-        end
-    end
+	if DEBUG then
+		debugCount = debugCount + 1
+		if debugMaxCount == 0 or debugCount < debugMaxCount then
+			debugWriteType(text)
+		elseif debugCount == debugMaxCount then 
+			debugWriteType("Message count at " .. debugMaxCount .. ", logging stopped")
+		end
+	end
 end
 
 local a = 214013 
@@ -34,10 +34,9 @@ local state = settings.startup["base-item-values-seed"].value
 
 -- Returns an integer from 0 to N - 1
 function rand(N)
-    state = (a * state + c) % M
-    return (math.floor( N*state / M ))
+	state = (a * state + c) % M
+	return (math.floor( N*state / M ))
 end
-
 
 --control.lua
 global.machine_entities={}
@@ -51,9 +50,9 @@ global.city_need_map={}
 --surface :: LuaSurface: The surface the chunk is on
 --cities
 cities = {
-"assembling-machine-1",
-"assembling-machine-2",
-"assembling-machine-3"
+	"assembling-machine-1",
+	"assembling-machine-2",
+	"assembling-machine-3"
 }
 
 minimum_city_distance = 100
@@ -96,55 +95,52 @@ global.bad_trade_map = {
 --spawn cities on chunk generation
 script.on_event({defines.events.on_chunk_generated},
    function (e)
-   
-		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end	
-		spawn_city(e)	
-			
-    end
+		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end
+		spawn_city(e)
+	end
 )
 
 script.on_init(function()
-
 	-- removed crashsite and cutscene start, so on_player_created inventory safe
-	remote.call("freeplay", "set_disable_crashsite", true)	
+	remote.call("freeplay", "set_disable_crashsite", true)  
 	
 	-- Skips popup message to press tab to start playing
 	remote.call("freeplay", "set_skip_intro", true)
 
-	
 	--game.surfaces.nauvis.always_day = true
 	--end recipes
 	if game.forces["player"].stack_inserter_capacity_bonus < 7 then
-	 game.forces["player"].stack_inserter_capacity_bonus = 7
+		game.forces["player"].stack_inserter_capacity_bonus = 7
 	end
 	if game.forces["player"].inserter_stack_size_bonus < 3 then
-	 game.forces["player"].inserter_stack_size_bonus = 3
+		game.forces["player"].inserter_stack_size_bonus = 3
 	end
 	
 	--spawn starting buildings
 	found = game.surfaces[1].find_non_colliding_position("rocket-silo", {0,0}, 0, 3) 
 	if found then
-	city = game.surfaces[1].create_entity{name="rocket-silo", position=found, force=game.forces.player} 
-					--prevent removal of cities as thats game breaking
-					city.destructible = false
-					city.minable = false
-					--prevent player from changing trades
-					city.recipe_locked = true 
-					city.operable =true
+		city = game.surfaces[1].create_entity{name="rocket-silo", position=found, force=game.forces.player} 
+		--prevent removal of cities as thats game breaking
+		city.destructible = false
+		city.minable = false
+		--prevent player from changing trades
+		city.recipe_locked = true 
+		city.operable =true
 	end --end if
+
 	-- need coal source
 	foundcoal = game.surfaces[1].find_non_colliding_position("assembling-machine-1", {math.random(-1, 1)*8,math.random(-1, 1)*8}, 30, 8, true) 
 	if foundcoal then
-	city = game.surfaces[1].create_entity{name="assembling-machine-1", position=foundcoal, force=game.forces.player, recipe ="Coal"}
-					--prevent removal of cities as thats game breaking
-					city.destructible = false
-					city.minable = false
-					
-					--prevent player from changing trades
-					city.recipe_locked = true 
-					
-					city.operable =true
-					table.insert(global.machine_entities, city)
+		city = game.surfaces[1].create_entity{name="assembling-machine-1", position=foundcoal, force=game.forces.player, recipe ="Coal"}
+		--prevent removal of cities as thats game breaking
+		city.destructible = false
+		city.minable = false
+		
+		--prevent player from changing trades
+		city.recipe_locked = true 
+		
+		city.operable =true
+		table.insert(global.machine_entities, city)
 	end
 	foundcoal = game.surfaces[1].find_non_colliding_position("assembling-machine-1", {math.random(-1, 1)*8,math.random(-1, 1)*8}, 30, 8, true) 
 	if foundcoal then
@@ -203,10 +199,8 @@ script.on_init(function()
 	end
 end)
 
-
-
 script.on_event(defines.events.on_player_created, function(e)
---wipe inventory as we dont want starter machines available
+	--wipe inventory as we dont want starter machines available
 
 	local player = game.get_player(e.player_index)
 	  player.clear_items_inside()
@@ -295,8 +289,6 @@ script.on_event(defines.events.on_player_created, function(e)
 	player.set_quick_bar_slot(99, "repair-pack")
 end)
 
-
-
 function spawn_city (e)
 
 	trades = { 1, 4, 5, 6, 6, 7, 7 }
@@ -310,13 +302,13 @@ function spawn_city (e)
 	traders = game.surfaces[1].find_entities_filtered{position = center, type = "assembling-machine", radius = minimum_city_distance}
 	if next(traders) ~= nil then return end
 	
-    local area = {{center.x-20,center.y-20},{center.x+20,center.y+20}}
+	local area = {{center.x-20,center.y-20},{center.x+20,center.y+20}}
 	-- If only obstacle is trees, remove the trees
-    for index, entity in pairs(game.surfaces[1].find_entities(area)) do
-        if entity.valid and (entity.type == "tree" or entity.type == "simple-entity") then
-            entity.destroy()
-        end
-    end
+	for index, entity in pairs(game.surfaces[1].find_entities(area)) do
+		if entity.valid and (entity.type == "tree" or entity.type == "simple-entity") then
+			entity.destroy()
+		end
+	end
 	
 	pavement = {}
 	local recorded =false
@@ -336,7 +328,7 @@ function spawn_city (e)
 		{ math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100) },
 		{ math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100) },
 		{ math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100),math.random(1,100) },
-		{ math.random(1,100) },	}
+		{ math.random(1,100) }, }
 	item_values[6][2] = item_values[5][4]
 	
 	function bits(input)
@@ -542,7 +534,7 @@ function spawn_city (e)
 	 for a2=1,#wants2[city_tier] do
 	  for b2=1,#gives2[city_tier] do
 	   for c=1,#global.trade_map[city_tier][wants2[city_tier][a2]] do
-	    if global.trade_map[city_tier][wants2[city_tier][a2]][c]==gives2[city_tier][b2] then
+		if global.trade_map[city_tier][wants2[city_tier][a2]][c]==gives2[city_tier][b2] then
 		 local r2 = math.floor( 21*math.log(2*(69+30*city_tier+item_values[city_tier][wants2[city_tier][a2]])/(69+30*city_tier+item_values[city_tier][gives2[city_tier][b2]]))/math.log(4) )
 		 for n=1,math.max(1,r2) do
 		  table.insert(possible_recipes,{wants2[city_tier][a2],gives2[city_tier][b2],r2})
@@ -591,7 +583,7 @@ function spawn_city (e)
 	 for a2=1,#wants2[city_tier] do
 	  for b2=1,#gives2[city_tier] do
 	   for c=1,#global.bad_trade_map[city_tier][wants2[city_tier][a2]] do
-	    if global.bad_trade_map[city_tier][wants2[city_tier][a2]][c]==gives2[city_tier][b2] then
+		if global.bad_trade_map[city_tier][wants2[city_tier][a2]][c]==gives2[city_tier][b2] then
 		 table.insert(possible_recipes,{wants2[city_tier][a2],gives2[city_tier][b2]})
 		end
 	   end
@@ -712,7 +704,7 @@ function spawn_city (e)
 	 for a2=1,#wants2[city_tier2] do
 	  for b2=1,#gives2[city_tier2] do
 	   for c=1,#global.trade_map[city_tier2][wants2[city_tier2][a2]] do
-	    if global.trade_map[city_tier2][wants2[city_tier2][a2]][c]==gives2[city_tier2][b2] then
+		if global.trade_map[city_tier2][wants2[city_tier2][a2]][c]==gives2[city_tier2][b2] then
 		 local r2 = math.floor( 21*math.log(2*(69+30*city_tier2+item_values[city_tier2][wants2[city_tier2][a2]])/(69+30*city_tier2+item_values[city_tier2][gives2[city_tier2][b2]]))/math.log(4) )
 		 for n=1,math.max(1,r2) do
 		  table.insert(possible_recipes,{wants2[city_tier2][a2],gives2[city_tier2][b2],r2})
@@ -761,7 +753,7 @@ function spawn_city (e)
 	 for a2=1,#wants2[city_tier2] do
 	  for b2=1,#gives2[city_tier2] do
 	   for c=1,#global.bad_trade_map[city_tier2][wants2[city_tier2][a2]] do
-	    if global.bad_trade_map[city_tier2][wants2[city_tier2][a2]][c]==gives2[city_tier2][b2] then
+		if global.bad_trade_map[city_tier2][wants2[city_tier2][a2]][c]==gives2[city_tier2][b2] then
 		 table.insert(possible_recipes,{wants2[city_tier2][a2],gives2[city_tier2][b2]})
 		end
 	   end
@@ -892,103 +884,93 @@ function spawn_city (e)
 	game.surfaces[1].set_tiles(paved)
 end
 
-
 function get_city_tier(coord)
+	max_tier = 1
+	x = math.abs(coord.x)
+	y= math.abs(coord.y)
 
-max_tier = 1
-x = math.abs(coord.x)
-y= math.abs(coord.y)
+	local factor = 1
 
-local factor = 1
+	if x > factor*1.5*minimum_city_distance or y > factor*1.5*minimum_city_distance then max_tier = 2 end
+	if x > factor*2.5*minimum_city_distance or y > factor*2.5*minimum_city_distance then max_tier = 3 end
+	if x > factor*3.5*minimum_city_distance or y > factor*3.5*minimum_city_distance then max_tier = 4 end
+	if x > factor*4.5*minimum_city_distance or y > factor*4.5*minimum_city_distance then max_tier = 5 end
+	if x > factor*5.5*minimum_city_distance or y > factor*5.5*minimum_city_distance then max_tier = 6 end
 
-if x > factor*1.5*minimum_city_distance or y > factor*1.5*minimum_city_distance then max_tier = 2 end
-if x > factor*2.5*minimum_city_distance or y > factor*2.5*minimum_city_distance then max_tier = 3 end
-if x > factor*3.5*minimum_city_distance or y > factor*3.5*minimum_city_distance then max_tier = 4 end
-if x > factor*4.5*minimum_city_distance or y > factor*4.5*minimum_city_distance then max_tier = 5 end
-if x > factor*5.5*minimum_city_distance or y > factor*5.5*minimum_city_distance then max_tier = 6 end
+	tier = math.random(1, max_tier)
 
-tier = math.random(1, max_tier)
-
-return tier
+	return tier
 end
 
-
 function record_city(tier, loc, science)
-
---table.insert(global.city_locations, {loc=loc,tier=tier, mapped = false, road=false, science= science})
-table.insert(global.city_need_map, {loc=loc, tier=tier, science= science})
+	--table.insert(global.city_locations, {loc=loc,tier=tier, mapped = false, road=false, science= science})
+	table.insert(global.city_need_map, {loc=loc, tier=tier, science= science})
 end
 
 script.on_event(defines.events.on_script_path_request_finished, function(e)
-
-if e.path ~=nil and next(e.path) ~=nil then
---game.get_player(1).print("path")
-	pavement ={}
-	for k,v in ipairs(e.path)do
-	table.insert(pavement, v.position)
-	--game.get_player(1).print(v.position)
+	if e.path ~=nil and next(e.path) ~=nil then
+	--game.get_player(1).print("path")
+		pavement ={}
+		for k,v in ipairs(e.path)do
+		table.insert(pavement, v.position)
+		--game.get_player(1).print(v.position)
+		end
+			tiles=
+		{
+		--"dry-dirt",
+		--"stone-path",
+		--"concrete",
+		--"hazard-concrete-left",
+		"refined-concrete",
+		"refined-hazard-concrete-right",
+		--"tutorial-grid",
+		}
+		for i,v in ipairs(pavement) do
+		paved[i]={name = tiles[math.random(#tiles)], position = v} 
+		end
+		game.surfaces[1].set_tiles(paved)
 	end
-		tiles=
-	{
-	--"dry-dirt",
-	--"stone-path",
-	--"concrete",
-	--"hazard-concrete-left",
-	"refined-concrete",
-	"refined-hazard-concrete-right",
-	--"tutorial-grid",
-	}
-	for i,v in ipairs(pavement) do
-	paved[i]={name = tiles[math.random(#tiles)], position = v} 
-	end
-	game.surfaces[1].set_tiles(paved)
-end
-
-end
-)
+end)
 
 function distance ( x1, y1, x2, y2 )
-  local dx = x1 - x2
-  local dy = y1 - y2
-  return math.sqrt ( dx * dx + dy * dy )
+	local dx = x1 - x2
+	local dy = y1 - y2
+	return math.sqrt ( dx * dx + dy * dy )
 end
 
 if settings.global["map-tags"].value then
-script.on_event({defines.events.on_tick},
-   function (e)
-   
-	if e.tick > 100 and e.tick % 2 == 0 then update_map()	end
-   end
-)
+	script.on_event({defines.events.on_tick},
+	   function (e)
+		if e.tick > 100 and e.tick % 2 == 0 then 
+			update_map()
+		end
+	end
+	)
 end
 
-   
-   
 function update_map()
-	if next(global.city_need_map) ~= nil then		
-		v= table.remove(global.city_need_map, math.random(#global.city_need_map))
-		--game.get_player(1).print(#global.city_need_map)	
-		--game.get_player(1).print("Popped V"..v.loc[1])		
-		
-			signalID = {type = "", name = ""}				
-			--if v.science then
-				signalID = {type = "item",}				
-				if v.tier == 1 then signalID.name = "automation-science-pack" end
-				if v.tier == 2 then signalID.name = "logistic-science-pack" end
-				if v.tier == 3 then signalID.name = "military-science-pack" end
-				if v.tier == 4 then signalID.name = "chemical-science-pack" end
-				if v.tier == 5 then signalID.name = "production-science-pack" end
-				if v.tier == 6 then signalID.name = "utility-science-pack" end
-				if v.tier == 7 then signalID.name = "space-science-pack" end
-				tag = {position=v.loc, text = "", icon = signalID}
-			--end
-			--if not v.science then tag = {position=v.loc, text = ""..v.tier.."" }	end	
-			valid = game.players[1].force.add_chart_tag(game.surfaces[1], tag)
-			if valid == nil then table.insert(global.city_need_map,v) 
-			--game.get_player(1).print("repushed V"..v.loc[1])	
-			end
-			
-				
+	if next(global.city_need_map) ~= nil then       
+		v = table.remove(global.city_need_map, math.random(#global.city_need_map))
+		--game.get_player(1).print(#global.city_need_map)   
+		--game.get_player(1).print("Popped V"..v.loc[1])        
+	
+		signalID = {type = "", name = ""}               
+		--if v.science then
+		signalID = {type = "item",}             
+		if v.tier == 1 then signalID.name = "automation-science-pack" end
+		if v.tier == 2 then signalID.name = "logistic-science-pack" end
+		if v.tier == 3 then signalID.name = "military-science-pack" end
+		if v.tier == 4 then signalID.name = "chemical-science-pack" end
+		if v.tier == 5 then signalID.name = "production-science-pack" end
+		if v.tier == 6 then signalID.name = "utility-science-pack" end
+		if v.tier == 7 then signalID.name = "space-science-pack" end
+		tag = {position=v.loc, text = "", icon = signalID}
+		--end
+		--if not v.science then tag = {position=v.loc, text = ""..v.tier.."" }  end 
+		valid = game.players[1].force.add_chart_tag(game.surfaces[1], tag)
+		if valid == nil then table.insert(global.city_need_map,v) 
+		--game.get_player(1).print("repushed V"..v.loc[1])  
+		end	
 	end 
 end --end function
 
