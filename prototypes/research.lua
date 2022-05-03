@@ -1,9 +1,12 @@
+--This script creates custom research
 
+--disable and hide all technology
 for k, v in pairs(data.raw.technology) do
 	v.enabled = false
 	v.hidden = true
 end
 
+-- Create new research
 data.raw.technology["steel-axe"] = {
     type = "technology",
     name = "steel-axe",
@@ -28,7 +31,6 @@ data.raw.technology["steel-axe"] = {
     order = "c-c-a"
   }
 
-
 data.raw.technology["toolbelt"] = {
     type = "technology",
     name = "toolbelt",
@@ -52,8 +54,7 @@ data.raw.technology["toolbelt"] = {
     },
     order = "c-k-m"
   }
-  
-    
+      
 data.raw.technology["inserter-capacity-bonus-1"] = {
     type = "technology",
     name = "inserter-capacity-bonus-1",
