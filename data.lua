@@ -47,6 +47,12 @@ styles["tro_trade_row"] = {
     horizontally_stretchable = "on",
 }
 
+styles["tro_trade_row_flow"] = {
+  type = "flow"
+  horizontally_stretchable = "on"
+  vertical_align = "center"
+}
+
 data:extend({
   {
     type = "shortcut",
