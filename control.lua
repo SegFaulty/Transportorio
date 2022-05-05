@@ -101,7 +101,7 @@ script.on_event({defines.events.on_chunk_generated},
 )
 
 script.on_init(function()
-	global.tro_players = {}
+	global.players = {}
 	-- removed crashsite and cutscene start, so on_player_created inventory safe
 	remote.call("freeplay", "set_disable_crashsite", true)  
 	
@@ -976,7 +976,7 @@ function update_map()
 end --end function
 
 function close_trade_menu(player)
-	local player_global = global.tro_players[player.index]
+	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
 	local main_frame = screen_element["tro_trade_root_frame"]
 
@@ -986,7 +986,7 @@ function close_trade_menu(player)
 end
 
 function open_trade_menu(player)
-	local player_global = global.tro_players[player.index]
+	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
 
 	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical"}
@@ -1010,15 +1010,16 @@ function open_trade_menu(player)
 
 	-- creates the list
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
-	for i=1,20 do
-		local trade_row = trades_list.add{type="frame", name="tro_trade_test_scroll/"  .. i, style="tro_trade_row"}
-		local trade_row_flow = trade_row.add{type="flow"}
-		trade_row_flow.add{type="sprite", sprite="item/iron-ore"}
-		trade_row_flow.style.horizontally_stretchable = "on"
-		trade_row_flow.style.vertical_align = "center"
-		local test = trade_row_flow.add{type="label", caption="11 --->"}
-		trade_row_flow.add{type="sprite", sprite="item/copper-ore"}
-		trade_row_flow.add{type="label", caption="12"}
+
+	for i, assembler in ipairs(global.machine_entities) do
+		if assembler.name == "assembling-machine-1" 
+		or assembler.name == "assembling-machine-2" 
+		or assembler.name == "assembling-machine-3" then
+			local recipe = assembler.get_recipe()
+			local ingredients = recipe.ingredients
+			local products = recipe.products
+			create_row(trades_list, ingredients, products)
+		end
 	end
 	
 	root_frame.style.size = {600, 700}
@@ -1026,10 +1027,29 @@ function open_trade_menu(player)
 	player_global.trade_menu = not player_global.trade_menu
 end
 
+function create_row(list, ingredients, products)
+	local trade_row = list.add{type="frame", style="tro_trade_row"}
+	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
+	
+	if #ingredients >= 1 then
+		for i, ingredient in ipairs(ingredients) do
+			trade_row_flow.add{type="sprite", sprite = "item/" .. ingredient.name}
+			trade_row_flow.add{type="label", caption = ingredient.amount}
+		end
+	end
+
+	trade_row_flow.add{type="label", caption = " --->"}
+
+	for i, product in ipairs(products) do
+		trade_row_flow.add{type="sprite", sprite = "item/" .. product.name}
+		trade_row_flow.add{type="label", caption = product.amount}
+	end
+end
+
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
-		global.tro_players[player.index] = { trade_menu = false }
+		global.players[player.index] = { trade_menu = false }
 	end
 )
 
@@ -1046,7 +1066,7 @@ script.on_event(defines.events.on_lua_shortcut,
 	function(event)
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
-			local player_global = global.tro_players[player.index]
+			local player_global = global.players[player.index]
 			if player_global.trade_menu == false then
 				open_trade_menu(player)
 			else
