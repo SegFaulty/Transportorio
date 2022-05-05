@@ -1008,6 +1008,7 @@ function open_trade_menu(player)
 		tooltip = {"gui.close-instruction"}
 	}
 
+	root_frame.add{type="textfield", name="tro_trade_menu_search"}
 	-- creates the list
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
@@ -1018,7 +1019,8 @@ function open_trade_menu(player)
 			local recipe = assembler.get_recipe()
 			local ingredients = recipe.ingredients
 			local products = recipe.products
-			create_row(trades_list, ingredients, products)
+			local position = assembler.position
+			create_row(trades_list, ingredients, products, position)
 		end
 	end
 	
@@ -1027,13 +1029,14 @@ function open_trade_menu(player)
 	player_global.trade_menu = not player_global.trade_menu
 end
 
-function create_row(list, ingredients, products)
+function create_row(list, ingredients, products, position)
 	local trade_row = list.add{type="frame", style="tro_trade_row"}
 	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
+	trade_row_flow.add{type="button", caption="ping", name="tro_ping_button", tags={location=position}}
 	
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
-			trade_row_flow.add{type="sprite", sprite = "item/" .. ingredient.name}
+			trade_row_flow.add{type="sprite", sprite = ingredient.type .. "/" .. ingredient.name}
 			trade_row_flow.add{type="label", caption = ingredient.amount}
 		end
 	end
@@ -1041,7 +1044,7 @@ function create_row(list, ingredients, products)
 	trade_row_flow.add{type="label", caption = " --->"}
 
 	for i, product in ipairs(products) do
-		trade_row_flow.add{type="sprite", sprite = "item/" .. product.name}
+		trade_row_flow.add{type="sprite", sprite = product.type .. "/" .. product.name}
 		trade_row_flow.add{type="label", caption = product.amount}
 	end
 end
@@ -1058,6 +1061,8 @@ script.on_event(defines.events.on_gui_click,
 		local player = game.get_player(event.player_index)
 		if event.element.name == "tro_trade_menu_header_exit_button" then
 			close_trade_menu(player)
+		elseif event.element.name == "tro_ping_button" then
+			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
 		end
 	end
 )
