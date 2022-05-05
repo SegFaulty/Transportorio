@@ -975,35 +975,84 @@ function update_map()
 	end 
 end --end function
 
+function close_trade_menu(player)
+	local player_global = global.tro_players[player.index]
+	local screen_element = player.gui.screen
+	local main_frame = screen_element["tro_trade_root_frame"]
+
+	main_frame.destroy()
+
+	player_global.trade_menu = not player_global.trade_menu
+end
+
+function open_trade_menu(player)
+	local player_global = global.tro_players[player.index]
+	local screen_element = player.gui.screen
+
+	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical"}
+
+	-- creates the title bar
+	local header = root_frame.add{type="flow", name="tro_trade_menu_header", direction="horizontal"}
+	header.add{type="label", caption={"tro.trade_menu_title"}, style="frame_title"}
+	local filler = header.add{type="empty-widget", style="draggable_space"}
+	filler.style.height = 24
+		filler.style.horizontally_stretchable = true
+		filler.drag_target = root_frame
+	header.add{
+		type = "sprite-button",
+		name = "tro_trade_menu_header_exit_button",
+		style = "frame_action_button",
+		sprite = "utility/close_white",
+		hovered_sprite = "utility/close_black",
+		clicked_sprite = "utility/close_black",
+		tooltip = {"gui.close-instruction"}
+	}
+
+	-- creates the list
+	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
+	for i=1,20 do
+		local trade_row = trades_list.add{type="frame", name="tro_trade_test_scroll/"  .. i, style="tro_trade_row"}
+		local trade_row_flow = trade_row.add{type="flow"}
+		trade_row_flow.add{type="sprite", sprite="item/iron-ore"}
+		trade_row_flow.style.horizontally_stretchable = "on"
+		trade_row_flow.style.vertical_align = "center"
+		local test = trade_row_flow.add{type="label", caption="11 --->"}
+		trade_row_flow.add{type="sprite", sprite="item/copper-ore"}
+		trade_row_flow.add{type="label", caption="12"}
+	end
+	
+	root_frame.style.size = {600, 700}
+	root_frame.auto_center = true
+	player_global.trade_menu = not player_global.trade_menu
+end
+
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
-
 		global.tro_players[player.index] = { trade_menu = false }
-
-		local screen_element = player.gui.screen
-		local main_frame = screen_element.add{type="frame", name="tro_trade_button_frame"}
-
-		main_frame.add{type="button", name="tro_trade_menu_toggle", caption={"tro.trades"}}
-end)
+	end
+)
 
 script.on_event(defines.events.on_gui_click,
 	function(event)
-		if event.element.name == "tro_trade_menu_toggle" then
-			local player = game.get_player(event.player_index)
-			local player_global = global.tro_players[player.index]
-			local screen_element = player.gui.screen
-			
-			-- create empty frame
-			if player_global.trade_menu == false then
-				local main_frame = screen_element.add{type="frame", name="tro_trade_frame"}
-
-				main_frame.style.size = {385, 165}
-				main_frame.auto_center = true
-			else
-				local main_frame = screen_element["tro_trade_frame"]
-				main_frame.destroy()
-			end
-			player_global.trade_menu = not player_global.trade_menu
+		local player = game.get_player(event.player_index)
+		if event.element.name == "tro_trade_menu_header_exit_button" then
+			close_trade_menu(player)
 		end
-end)
+	end
+)
+
+script.on_event(defines.events.on_lua_shortcut,
+	function(event)
+		local player = game.get_player(event.player_index)
+		if event.prototype_name == "trades" then
+			local player_global = global.tro_players[player.index]
+			if player_global.trade_menu == false then
+				open_trade_menu(player)
+			else
+				close_trade_menu(player)
+			end
+			
+		end
+	end
+)

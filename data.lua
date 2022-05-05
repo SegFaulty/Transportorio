@@ -35,3 +35,52 @@ data.raw["module"]["productivity-module"  ].effect.speed.bonus = -0.1
 --data.raw["module"]["productivity-module-2"].effect.speed.bonus = -0.15
 data.raw["module"]["productivity-module-3"].effect.speed.bonus = -0.25
 
+local styles = data.raw["gui-style"].default
+
+styles["tro_trades_list"] = {
+    type = "scroll_pane_style",
+    horizontally_stretchable = "on"
+}
+
+styles["tro_trade_row"] = {
+    type = "frame_style",
+    horizontally_stretchable = "on",
+}
+
+data:extend({
+  {
+    type = "shortcut",
+    name = "trades",
+    localised_name = { "tro.shortcut_name"},
+    order = "a",
+    action = "lua",
+    style = "green",
+    icon = {
+      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      flags = {
+        "icon"
+      },
+      priority = "extra-high-no-scale",
+      scale = 2,
+      size = 64
+    },
+    small_icon = {
+      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      flags = {
+        "icon"
+      },
+      priority = "extra-high-no-scale",
+      scale = 1,
+      size = 64
+    },
+    disabled_small_icon = {
+      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      flags = {
+        "icon"
+      },
+      priority = "extra-high-no-scale",
+      scale = 1,
+      size = 64
+    },
+  },
+})
