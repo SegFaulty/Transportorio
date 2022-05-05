@@ -48,8 +48,8 @@ styles["tro_trade_row"] = {
 }
 
 styles["tro_trade_row_flow"] = {
-  type = "flow"
-  horizontally_stretchable = "on"
+  type = "horizontal_flow_style",
+  horizontally_stretchable = "on",
   vertical_align = "center"
 }
 
