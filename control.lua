@@ -982,7 +982,7 @@ function close_trade_menu(player)
 
 	main_frame.destroy()
 
-	player_global.trade_menu = not player_global.trade_menu
+	player_global.trade_menu_active = not player_global.trade_menu_active
 end
 
 function open_trade_menu(player)
@@ -1000,7 +1000,7 @@ function open_trade_menu(player)
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
-	player_global.trade_menu = not player_global.trade_menu
+	player_global.trade_menu_active = not player_global.trade_menu_active
 end
 
 function create_title_bar(root_element)
@@ -1095,7 +1095,7 @@ end
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
-		global.players[player.index] = { trade_menu = false }
+		global.players[player.index] = { trade_menu_active = false }
 	end
 )
 
@@ -1127,7 +1127,7 @@ script.on_event(defines.events.on_lua_shortcut,
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
 			local player_global = global.players[player.index]
-			if player_global.trade_menu == false then
+			if player_global.trade_menu_active == false then
 				open_trade_menu(player)
 			else
 				close_trade_menu(player)
