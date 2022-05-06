@@ -1,10 +1,10 @@
 {
-    "name": "TradeRouteOverhaul",
-    "version": "0.0.4",
-    "title": "TradeRouteOverhaul",
-    "author": "DaveMcDave",
+    "name": "Transportorio",
+    "version": "0.0.5",
+    "title": "Transportorio",
+    "author": "Zomiib",
     "contact": "",
     "homepage": "",
     "factorio_version": "1.1",
     "dependencies": ["base >= 1.1"],
-    "description": "My take on balancing Singistics. Total conversion replacing crafting and research with randomized trade routes. Not intended to be compatible with any other mods."}
+    "description": "Transport resources and trade your way up! start with just a bit of coal and work your way up to rockets."}
