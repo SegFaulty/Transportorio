@@ -1104,12 +1104,18 @@ script.on_event(defines.events.on_gui_click,
 		local player = game.get_player(event.player_index)
 		if event.element.name == "tro_trade_menu_header_exit_button" then
 			close_trade_menu(player)
+
 		elseif event.element.name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
+
 		elseif event.element.tags.action == "tro_filter_list" then
 			if event.button == 4 then
+				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
+				textfield.text = "ingredient:" .. event.element.tags.item
 				filter_trade_menu(player, {ingredient=event.element.tags.item, product=nil})
 			elseif event.button == 2 then
+				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
+				textfield.text = "product:" .. event.element.tags.item
 				filter_trade_menu(player, {ingredient=nil, product=event.element.tags.item})
 			end
 		end
@@ -1136,6 +1142,17 @@ script.on_event(defines.events.on_gui_text_changed,
 		local player = game.get_player(event.player_index)
 		local search_filter = event.element.text
 		local sanitized_filter = string.gsub(search_filter, " ", "-")
-		filter_trade_menu(player, {ingredient=sanitized_filter, product=sanitized_filter})
+
+		if string.find(sanitized_filter,"product:" , 0, true) then
+			local filter = search_filter.gsub(search_filter, "product:", "")
+			filter_trade_menu(player, {ingredient=nil, product=filter})
+
+		elseif string.find(sanitized_filter,"ingredient:" , 0, true) then
+			local filter = search_filter.gsub(search_filter, "ingredient:", "")
+			filter_trade_menu(player, {ingredient=filter, product=nil})
+
+		else
+			filter_trade_menu(player, {ingredient=sanitized_filter, product=sanitized_filter})
+		end
 	end
 )
