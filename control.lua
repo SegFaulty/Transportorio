@@ -991,13 +991,25 @@ function open_trade_menu(player)
 
 	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical"}
 
-	-- creates the title bar
-	local header = root_frame.add{type="flow", name="tro_trade_menu_header", direction="horizontal"}
+	create_title_bar(root_frame)
+
+	root_frame.add{type="textfield", name="tro_trade_menu_search"}
+	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
+
+	fill_trade_menu_list(trades_list, global.machine_entities, {ingredient="", product=""})
+	
+	root_frame.style.size = {800, 700}
+	root_frame.auto_center = true
+	player_global.trade_menu = not player_global.trade_menu
+end
+
+function create_title_bar(root_element)
+	local header = root_element.add{type="flow", name="tro_trade_menu_header", direction="horizontal"}
 	header.add{type="label", caption={"tro.trade_menu_title"}, style="frame_title"}
 	local filler = header.add{type="empty-widget", style="draggable_space"}
 	filler.style.height = 24
 		filler.style.horizontally_stretchable = true
-		filler.drag_target = root_frame
+		filler.drag_target = root_element
 	header.add{
 		type = "sprite-button",
 		name = "tro_trade_menu_header_exit_button",
@@ -1007,26 +1019,57 @@ function open_trade_menu(player)
 		clicked_sprite = "utility/close_black",
 		tooltip = {"gui.close-instruction"}
 	}
+end
 
-	root_frame.add{type="textfield", name="tro_trade_menu_search"}
-	-- creates the list
-	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
-
-	for i, assembler in ipairs(global.machine_entities) do
-		if assembler.name == "assembling-machine-1" 
-		or assembler.name == "assembling-machine-2" 
-		or assembler.name == "assembling-machine-3" then
-			local recipe = assembler.get_recipe()
-			local ingredients = recipe.ingredients
-			local products = recipe.products
-			local position = assembler.position
-			create_row(trades_list, ingredients, products, position)
+function fill_trade_menu_list(list, machines, filter)
+	-- filter out machines that are not assemblers
+	local assemblers = {}
+	for x, machine in ipairs(machines) do
+		if machine.name == "assembling-machine-1" 
+		or machine.name == "assembling-machine-2" 
+		or machine.name == "assembling-machine-3" then
+			table.insert(assemblers, machine)		
 		end
 	end
-	
-	root_frame.style.size = {600, 700}
-	root_frame.auto_center = true
-	player_global.trade_menu = not player_global.trade_menu
+
+	-- filter assemblers according to filter
+	local filtered_assemblers = {}
+	for x, assembler in ipairs(assemblers) do
+		local recipe = assembler.get_recipe()
+
+		for i, ingredient in ipairs(recipe.ingredients) do
+			if filter.ingredient == nil then break
+			elseif string.find(ingredient.name, filter.ingredient, 0, true) then
+				table.insert(filtered_assemblers, assembler)
+				goto ending
+			end
+		end
+
+		for i, product in ipairs(recipe.products) do
+			if filter.product == nil then break
+			elseif string.find(product.name, filter.product, 0, true) then
+				table.insert(filtered_assemblers, assembler)
+				goto ending
+			end
+		end
+
+		::ending::
+	end
+
+	-- add assemblers to list
+	for i, assembler in ipairs(filtered_assemblers) do
+		local position = assembler.position
+		local recipe = assembler.get_recipe()
+		local ingredients = recipe.ingredients
+		local products = recipe.products
+		create_row(list, ingredients, products, position)
+	end
+end
+
+function filter_trade_menu(player, filter)
+	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
+	trades_list.clear()
+	fill_trade_menu_list(trades_list, global.machine_entities, filter)
 end
 
 function create_row(list, ingredients, products, position)
@@ -1036,7 +1079,7 @@ function create_row(list, ingredients, products, position)
 	
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
-			trade_row_flow.add{type="sprite", sprite = ingredient.type .. "/" .. ingredient.name}
+			trade_row_flow.add{type="sprite-button", sprite = ingredient.type .. "/" .. ingredient.name, tags={action="tro_filter_list", item=ingredient.name, type="ingredient"}}
 			trade_row_flow.add{type="label", caption = ingredient.amount}
 		end
 	end
@@ -1044,7 +1087,7 @@ function create_row(list, ingredients, products, position)
 	trade_row_flow.add{type="label", caption = " --->"}
 
 	for i, product in ipairs(products) do
-		trade_row_flow.add{type="sprite", sprite = product.type .. "/" .. product.name}
+		trade_row_flow.add{type="sprite-button", sprite = product.type .. "/" .. product.name, tags={action="tro_filter_list", item=product.name, type="product"}}
 		trade_row_flow.add{type="label", caption = product.amount}
 	end
 end
@@ -1063,6 +1106,12 @@ script.on_event(defines.events.on_gui_click,
 			close_trade_menu(player)
 		elseif event.element.name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
+		elseif event.element.tags.action == "tro_filter_list" then
+			if event.button == 4 then
+				filter_trade_menu(player, {ingredient=event.element.tags.item, product=nil})
+			elseif event.button == 2 then
+				filter_trade_menu(player, {ingredient=nil, product=event.element.tags.item})
+			end
 		end
 	end
 )
@@ -1079,5 +1128,14 @@ script.on_event(defines.events.on_lua_shortcut,
 			end
 			
 		end
+	end
+)
+
+script.on_event(defines.events.on_gui_text_changed,
+	function(event)
+		local player = game.get_player(event.player_index)
+		local search_filter = event.element.text
+		local sanitized_filter = string.gsub(search_filter, " ", "-")
+		filter_trade_menu(player, {ingredient=sanitized_filter, product=sanitized_filter})
 	end
 )
