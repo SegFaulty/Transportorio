@@ -1,14 +1,25 @@
-0.0.4
-	fixed utility science pack recipe
-
-0.0.3
-	all inserters are now stack inserters, starts at 4 and upgrades to 8 and 12. only actual stack inserter gets infinite research. rearanged inserters in malls. 
-	added alternative satellite recipes, each only requires 3 (of 6) ingredients but about 3 times the quantity. most tier 5 & 6 malls will have a satellite trade.
-	math.random on trade_map is changed to the seeded random
-	added map-tags setting
-
-0.0.2
-	rearranged malls 3-6 to bring red belts earlier
-	added a 'seed' setting for the base value of items. randomized these hidden values so i can play without knowing exactly what they are
-	added some 'bad' trades. for each pair of items either the A to B trade or the B to A trade will be 'bad'. they will only appear in the rightmost trade of each tier
-	added "probability-of-city-placement" setting. percent chance for a chunk to spawn a city when it is far enough from other cities
+---------------------------------------------------------------------------------------------------
+Version: 0.0.5
+Date: 2022-05-05
+	- Branched off from TradeRouteOverhaul into Transportorio
+	- Updated to Factorio version 1.1
+	- Added a basic GUI for finding trade routes
+---------------------------------------------------------------------------------------------------
+Version: 0.0.4
+Date: Unknown
+	- fixed utility science pack recipe
+---------------------------------------------------------------------------------------------------
+Version: 0.0.3
+Date: Unknown
+	- all inserters are now stack inserters, starts at 4 and upgrades to 8 and 12. only actual stack inserter gets infinite research. rearanged inserters in malls. 
+	- added alternative satellite recipes, each only requires 3 (of 6) ingredients but about 3 times the quantity. most tier 5 & 6 malls will have a satellite trade.
+	- math.random on trade_map is changed to the seeded random
+	- added map-tags setting
+---------------------------------------------------------------------------------------------------
+Version: 0.0.2
+Date: Unknown
+	- rearranged malls 3-6 to bring red belts earlier
+	- added a 'seed' setting for the base value of items. randomized these hidden values so i can play without knowing exactly what they are
+	- added some 'bad' trades. for each pair of items either the A to B trade or the B to A trade will be 'bad'. they will only appear in the rightmost trade of each tier
+	- added "probability-of-city-placement" setting. percent chance for a chunk to spawn a city when it is far enough from other cities
+---------------------------------------------------------------------------------------------------
