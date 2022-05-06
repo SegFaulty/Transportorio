@@ -982,7 +982,7 @@ function close_trade_menu(player)
 
 	main_frame.destroy()
 
-	player_global.trade_menu_active = not player_global.trade_menu_active
+	player_global.trade_menu.active = not player_global.trade_menu.active
 end
 
 function open_trade_menu(player)
@@ -1000,7 +1000,7 @@ function open_trade_menu(player)
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
-	player_global.trade_menu_active = not player_global.trade_menu_active
+	player_global.trade_menu.active = not player_global.trade_menu.active
 end
 
 function create_title_bar(root_element)
@@ -1092,10 +1092,42 @@ function create_row(list, ingredients, products, position)
 	end
 end
 
+function add_term_to_player_search_history(player, search_item)
+	local history = global.players[player.index].trade_menu.search_history
+	local history_length = #history
+
+	-- prevent repeating history (A,B,A,B,A,B) by removing second last if it matches new search
+	if search_item == history[2] then
+		table.remove(history, 2)
+		table.insert(history, 1, search_item)
+
+	-- dont add to history if it hasnt changed
+	elseif search_item ~= history[1] then
+		table.insert(history, 1, search_item)
+	end
+
+	-- stop history from going past max size for performance
+	if history_length >= 100 then
+		table.remove(history, history_length) -- remove last element
+	end
+
+	-- debug, prints out search history
+	-- local history_string = ""
+	-- for i, search_term in ipairs(history) do
+	-- 	history_string = history_string .. ", " .. search_term
+	-- end
+	-- game.print(history_string)
+end
+
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
-		global.players[player.index] = { trade_menu_active = false }
+		global.players[player.index] = {
+			trade_menu = {
+				active = false,
+				search_history = {}
+			}
+		}
 	end
 )
 
@@ -1109,14 +1141,19 @@ script.on_event(defines.events.on_gui_click,
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
 
 		elseif event.element.tags.action == "tro_filter_list" then
-			if event.button == 4 then
+			if event.button == 4 then -- right mouse button
 				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
-				textfield.text = "ingredient:" .. event.element.tags.item
+				local search_term = "ingredient:" .. event.element.tags.item
+				textfield.text = search_term
 				filter_trade_menu(player, {ingredient=event.element.tags.item, product=nil})
-			elseif event.button == 2 then
+				add_term_to_player_search_history(player, search_term)
+
+			elseif event.button == 2 then -- left mouse button
 				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
-				textfield.text = "product:" .. event.element.tags.item
+				local search_term = "product:" .. event.element.tags.item
+				textfield.text = search_term
 				filter_trade_menu(player, {ingredient=nil, product=event.element.tags.item})
+				add_term_to_player_search_history(player, search_term)
 			end
 		end
 	end
@@ -1127,7 +1164,7 @@ script.on_event(defines.events.on_lua_shortcut,
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
 			local player_global = global.players[player.index]
-			if player_global.trade_menu_active == false then
+			if player_global.trade_menu.active == false then
 				open_trade_menu(player)
 			else
 				close_trade_menu(player)
