@@ -62,7 +62,7 @@ data:extend({
     action = "lua",
     style = "green",
     icon = {
-      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      filename = "__Transportorio__/graphics/icons/t.png",
       flags = {
         "icon"
       },
@@ -71,7 +71,7 @@ data:extend({
       size = 64
     },
     small_icon = {
-      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      filename = "__Transportorio__/graphics/icons/t.png",
       flags = {
         "icon"
       },
@@ -80,7 +80,7 @@ data:extend({
       size = 64
     },
     disabled_small_icon = {
-      filename = "__TradeRouteOverhaul__/graphics/icons/t.png",
+      filename = "__Transportorio__/graphics/icons/t.png",
       flags = {
         "icon"
       },

@@ -183,7 +183,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-1-3-5-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-1-3-5.png",
+    icon = "__Transportorio__/graphics/s-1-3-5.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -207,7 +207,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-1-3-6-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-1-3-6.png",
+    icon = "__Transportorio__/graphics/s-1-3-6.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -231,7 +231,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-1-4-5-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-1-4-5.png",
+    icon = "__Transportorio__/graphics/s-1-4-5.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -255,7 +255,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-1-4-6-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-1-4-6.png",
+    icon = "__Transportorio__/graphics/s-1-4-6.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -279,7 +279,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-2-3-5-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-2-3-5.png",
+    icon = "__Transportorio__/graphics/s-2-3-5.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -303,7 +303,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-2-3-6-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-2-3-6.png",
+    icon = "__Transportorio__/graphics/s-2-3-6.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -327,7 +327,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-2-4-5-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-2-4-5.png",
+    icon = "__Transportorio__/graphics/s-2-4-5.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,
@@ -351,7 +351,7 @@ for r=0,21,1 do
    {
     type = "recipe",
     name = "s-2-4-6-"..r,
-    icon = "__TradeRouteOverhaul__/graphics/s-2-4-6.png",
+    icon = "__Transportorio__/graphics/s-2-4-6.png",
     icon_size = 64, icon_mipmaps = 4,
     energy_required = .1,
     enabled = true,

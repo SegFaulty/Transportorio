@@ -147,7 +147,7 @@ for i=1,#desired_items.t1,1 do
 				{
 				type = "recipe",
 				name = "mall-1-"..i.."-1-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-1-"..i.."-1-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-1-"..i.."-1-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -176,7 +176,7 @@ for i=1,#desired_items.t2,1 do
 				{
 				type = "recipe",
 				name = "mall-2-"..i.."-3-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-2-"..i.."-3-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-2-"..i.."-3-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -205,7 +205,7 @@ for i=1,#desired_items.t3,1 do
 				{
 				type = "recipe",
 				name = "mall-3-"..i.."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-3-"..i.."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-3-"..i.."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -234,7 +234,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "mall-4-"..(2*i).."-7-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-4-"..(2*i).."-7-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-4-"..(2*i).."-7-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -263,7 +263,7 @@ for i=1,#desired_items.t5,1 do
 				{
 				type = "recipe",
 				name = "mall-5-"..i.."-9-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-5-"..i.."-9-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-5-"..i.."-9-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -292,7 +292,7 @@ for i=1,#desired_items.t6,1 do
 				{
 				type = "recipe",
 				name = "mall-6-"..i.."-11-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/mall-6-"..i.."-11-"..z..".png",
+				icon = "__Transportorio__/graphics/mall-6-"..i.."-11-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -319,7 +319,7 @@ for i=1,#mall_items.t2,1 do
 		{
 		type = "recipe",
 		name = "mall-7-1-2-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-1-2-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-1-2-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -344,7 +344,7 @@ for i=1,#mall_items.t4,1 do
 		{
 		type = "recipe",
 		name = "mall-7-2-4-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-2-4-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-2-4-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -369,7 +369,7 @@ for i=1,#mall_items.t6-2,1 do
 		{
 		type = "recipe",
 		name = "mall-7-3-6-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-3-6-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-3-6-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -394,7 +394,7 @@ for i=9,#mall_items.t6,1 do
 		{
 		type = "recipe",
 		name = "mall-7-3-6-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-7-14-"..(i-7)..".png",
+		icon = "__Transportorio__/graphics/mall-7-7-14-"..(i-7)..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -420,7 +420,7 @@ for i=1,#mall_items.t8,1 do
 		{
 		type = "recipe",
 		name = "mall-7-4-8-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-4-8-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-4-8-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -445,7 +445,7 @@ for i=1,#mall_items.t10-1,1 do
 		{
 		type = "recipe",
 		name = "mall-7-5-10-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-5-10-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-5-10-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,
@@ -470,7 +470,7 @@ for r=0,21,1 do
 	{
 	type = "recipe",
 	name = "mall-7-5-10-4-"..r,
-	icon = "__TradeRouteOverhaul__/graphics/mall-7-7-14-1.png",
+	icon = "__Transportorio__/graphics/mall-7-7-14-1.png",
 	icon_size = 64, icon_mipmaps = 4,
 	energy_required = .1,
 	enabled = true,
@@ -495,7 +495,7 @@ for i=1,#mall_items.t12,1 do
 		{
 		type = "recipe",
 		name = "mall-7-6-12-"..i.."-"..r,
-		icon = "__TradeRouteOverhaul__/graphics/mall-7-6-12-"..i..".png",
+		icon = "__Transportorio__/graphics/mall-7-6-12-"..i..".png",
 		icon_size = 64, icon_mipmaps = 4,
 		energy_required = .1,
 		enabled = true,

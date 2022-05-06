@@ -12,7 +12,7 @@ for i=1,#desired_items.t0,1 do
 					{
 					type = "recipe",
 					name = "Trade-0-"..i.."-1-"..z.."-"..r,
-					icon = "__TradeRouteOverhaul__/graphics/trade-0-"..i.."-1-"..z..".png",
+					icon = "__Transportorio__/graphics/trade-0-"..i.."-1-"..z..".png",
 					icon_size = 64, icon_mipmaps = 4,
 					energy_required = .1,
 					enabled = true,
@@ -34,7 +34,7 @@ for i=1,#desired_items.t0,1 do
 					{
 					type = "recipe",
 					name = "Trade-0-"..i.."-1-"..z.."-"..r,
-					icon = "__TradeRouteOverhaul__/graphics/trade-0-"..i.."-1-"..z..".png",
+					icon = "__Transportorio__/graphics/trade-0-"..i.."-1-"..z..".png",
 					icon_size = 64, icon_mipmaps = 4,
 					energy_required = .1,
 					enabled = true,
@@ -58,7 +58,7 @@ for i=1,#desired_items.t0,1 do
 					{
 					type = "recipe",
 					name = "Trade-0-"..i.."-1-"..z.."-"..r,
-					icon = "__TradeRouteOverhaul__/graphics/trade-0-"..i.."-1-"..z..".png",
+					icon = "__Transportorio__/graphics/trade-0-"..i.."-1-"..z..".png",
 					icon_size = 64, icon_mipmaps = 4,
 					energy_required = .1,
 					enabled = true,
@@ -89,7 +89,7 @@ for i=1,#desired_items.t1,1 do
 				{
 				type = "recipe",
 				name = "Trade-1-"..i.."-2-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-1-"..i.."-2-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-1-"..i.."-2-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -111,7 +111,7 @@ for i=1,#desired_items.t1,1 do
 				{
 				type = "recipe",
 				name = "Trade-1-"..i.."-2-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-1-"..i.."-2-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-1-"..i.."-2-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -135,7 +135,7 @@ for i=1,#desired_items.t1,1 do
 				{
 				type = "recipe",
 				name = "Trade-1-"..i.."-2-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-1-"..i.."-2-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-1-"..i.."-2-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -165,7 +165,7 @@ for i=1,#desired_items.t2,1 do
 				{
 				type = "recipe",
 				name = "Trade-2-"..i.."-3-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-2-"..i.."-3-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-2-"..i.."-3-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -187,7 +187,7 @@ for i=1,#desired_items.t2,1 do
 				{
 				type = "recipe",
 				name = "Trade-2-"..i.."-3-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-2-"..i.."-3-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-2-"..i.."-3-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -211,7 +211,7 @@ for i=1,#desired_items.t2,1 do
 				{
 				type = "recipe",
 				name = "Trade-2-"..i.."-3-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-2-"..i.."-3-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-2-"..i.."-3-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -242,7 +242,7 @@ for i=1,#desired_items.t2,1 do
 			{
 			type = "recipe",
 			name = "Trade-2-"..i.."-4-"..(2*z-1).."-"..r,
-			icon = "__TradeRouteOverhaul__/graphics/trade-2-"..i.."-4-"..(2*z-1)..".png",
+			icon = "__Transportorio__/graphics/trade-2-"..i.."-4-"..(2*z-1)..".png",
 			icon_size = 64, icon_mipmaps = 4,
 			category = "crafting-with-fluid",
 			energy_required = .1,
@@ -271,7 +271,7 @@ for i=1,#desired_items.t3,1 do
 			{
 			type = "recipe",
 			name = "Trade-3-"..i.."-4-"..(2*z-1).."-"..r,
-			icon = "__TradeRouteOverhaul__/graphics/trade-3-"..i.."-4-"..(2*z-1)..".png",
+			icon = "__Transportorio__/graphics/trade-3-"..i.."-4-"..(2*z-1)..".png",
 			icon_size = 64, icon_mipmaps = 4,
 			category = "crafting-with-fluid",
 			energy_required = .1,
@@ -300,7 +300,7 @@ for i=1,#desired_items.t3,1 do
 				{
 				type = "recipe",
 				name = "Trade-3-"..i.."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-3-"..i.."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-3-"..i.."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -322,7 +322,7 @@ for i=1,#desired_items.t3,1 do
 				{
 				type = "recipe",
 				name = "Trade-3-"..i.."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-3-"..i.."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-3-"..i.."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -346,7 +346,7 @@ for i=1,#desired_items.t3,1 do
 				{
 				type = "recipe",
 				name = "Trade-3-"..i.."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-3-"..i.."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-3-"..i.."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -377,7 +377,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -399,7 +399,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -423,7 +423,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-5-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-5-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -454,7 +454,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -476,7 +476,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -500,7 +500,7 @@ for i=1,#desired_items.t4,1 do
 				{
 				type = "recipe",
 				name = "Trade-4-"..(2*i).."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-4-"..(2*i).."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -531,7 +531,7 @@ for i=1,#desired_items.t5,1 do
 				{
 				type = "recipe",
 				name = "Trade-5-"..i.."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-5-"..i.."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-5-"..i.."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -553,7 +553,7 @@ for i=1,#desired_items.t5,1 do
 				{
 				type = "recipe",
 				name = "Trade-5-"..i.."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-5-"..i.."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-5-"..i.."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
@@ -577,7 +577,7 @@ for i=1,#desired_items.t5,1 do
 				{
 				type = "recipe",
 				name = "Trade-5-"..i.."-6-"..z.."-"..r,
-				icon = "__TradeRouteOverhaul__/graphics/trade-5-"..i.."-6-"..z..".png",
+				icon = "__Transportorio__/graphics/trade-5-"..i.."-6-"..z..".png",
 				icon_size = 64, icon_mipmaps = 4,
 				energy_required = .1,
 				enabled = true,
