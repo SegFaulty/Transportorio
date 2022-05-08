@@ -1002,7 +1002,7 @@ function open_trade_menu(player)
 	root_frame.add{type="textfield", name="tro_trade_menu_search"}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
-	create_trade_menu_list_rows(trades_list, global.machine_entities, {ingredient="", product=""}, player)
+	create_trade_menu_list_rows(trades_list, global.machine_entities, "", "any", player)
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
@@ -1028,7 +1028,8 @@ function create_title_bar(root_element)
 end
 
 -- creates each trade row from the list of machines and a filter. then adds the rows onto the list
-function create_trade_menu_list_rows(list, machines, filter, player)
+function create_trade_menu_list_rows(list, machines, search_term, filter, player)
+
 	-- filter out machines that are not assemblers
 	local assemblers = {}
 	for x, machine in ipairs(machines) do
@@ -1044,27 +1045,42 @@ function create_trade_menu_list_rows(list, machines, filter, player)
 	for x, assembler in ipairs(assemblers) do
 		local recipe = assembler.get_recipe()
 
-		for i, ingredient in ipairs(recipe.ingredients) do
-			if filter.ingredient == nil then break
-			elseif string.find(ingredient.name, filter.ingredient, 0, true) then
-				table.insert(filtered_assemblers, assembler)
-				goto ending
+		-- add any assemblers that have the searched term in their recipe
+		if filter == "any" then 
+			for i, product in ipairs(recipe.products) do
+				if string.find(product.name, search_term, 0, true) then
+					goto add_item
+				end
+			end
+			for i, ingredient in ipairs(recipe.ingredients) do
+				if string.find(ingredient.name, search_term, 0, true) then
+					goto add_item
+				end
+			end
+			::add_item::
+			table.insert(filtered_assemblers, assembler)
+
+		-- add assemblers where they produce the searched term
+		elseif filter == "product" then
+			for i, product in ipairs(recipe.products) do
+				if string.find(product.name, search_term, 0, true) then
+					table.insert(filtered_assemblers, assembler)
+				end
+			end
+
+		-- add assemblers where they require the searched term to produce something
+		elseif filter == "ingredient" then
+			for i, ingredient in ipairs(recipe.ingredients) do
+				if string.find(ingredient.name, search_term, 0, true) then
+					table.insert(filtered_assemblers, assembler)
+				end
 			end
 		end
-
-		for i, product in ipairs(recipe.products) do
-			if filter.product == nil then break
-			elseif string.find(product.name, filter.product, 0, true) then
-				table.insert(filtered_assemblers, assembler)
-				goto ending
-			end
-		end
-
-		::ending::
 	end
 
+
 	if #filtered_assemblers > 0 then
-		-- add assemblers to list
+		-- create a row for each recipe for each assembler
 		for i, assembler in ipairs(filtered_assemblers) do
 			local position = assembler.position
 			local recipe = assembler.get_recipe()
@@ -1073,7 +1089,7 @@ function create_trade_menu_list_rows(list, machines, filter, player)
 			create_row(list, ingredients, products, position)
 		end
 	else 
-		-- if list is still empty update text
+		-- if list is empty, create a message saying as much
 		local message_element = create_failed_search_message(list, player, filter)
 	end
 end
@@ -1177,31 +1193,31 @@ function move_backward_in_trade_menu_search_history(player)
 end
 
 -- updates the trade menu window search bar and search list based on search text
-function update_trade_menu_search(player, new_search, add_to_search_history)
+function update_trade_menu_search(player, searched_term, add_to_search_history)
 	if add_to_search_history then
-		add_term_to_player_search_history(player, new_search)
+		add_term_to_player_search_history(player, searched_term)
 	end
 
 	-- update search field
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
-	textfield.text = new_search
+	textfield.text = searched_term
 
 	-- convert search into proper data structure
-	local search_filter = {ingredient=nil, product=nil}
-	if string.find(new_search, "product:") then
-		local sanitized_filter = string.gsub(new_search, "product:", "")
-		search_filter.product = sanitized_filter
-	elseif string.find(new_search, "ingredient:") then
-		local sanitized_filter = string.gsub(new_search, "ingredient:", "")
-		search_filter.ingredient = sanitized_filter
+	local search_filter = ""
+	if string.find(searched_term, "product:") then
+		searched_term = string.gsub(searched_term, "product:", "")
+		search_filter = "product"
+	elseif string.find(searched_term, "ingredient:") then
+		searched_term = string.gsub(searched_term, "ingredient:", "")
+		search_filter = "ingredient"
 	else
-		search_filter = {ingredient=new_search, product=new_search}
+		search_filter = "any"
 	end
 		
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
-	create_trade_menu_list_rows(trades_list, global.machine_entities, search_filter, player)
+	create_trade_menu_list_rows(trades_list, global.machine_entities, searched_term, search_filter, player)
 end
 
 -- opens players trade menu if closed; closes players trade menu if open
