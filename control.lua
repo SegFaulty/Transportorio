@@ -1002,7 +1002,7 @@ function open_trade_menu(player)
 	root_frame.add{type="textfield", name="tro_trade_menu_search"}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
-	create_trade_menu_list_rows(trades_list, global.machine_entities, {ingredient="", product=""})
+	create_trade_menu_list_rows(trades_list, global.machine_entities, {ingredient="", product=""}, player)
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
@@ -1028,7 +1028,7 @@ function create_title_bar(root_element)
 end
 
 -- creates each trade row from the list of machines and a filter. then adds the rows onto the list
-function create_trade_menu_list_rows(list, machines, filter)
+function create_trade_menu_list_rows(list, machines, filter, player)
 	-- filter out machines that are not assemblers
 	local assemblers = {}
 	for x, machine in ipairs(machines) do
@@ -1063,13 +1063,43 @@ function create_trade_menu_list_rows(list, machines, filter)
 		::ending::
 	end
 
-	-- add assemblers to list
-	for i, assembler in ipairs(filtered_assemblers) do
-		local position = assembler.position
-		local recipe = assembler.get_recipe()
-		local ingredients = recipe.ingredients
-		local products = recipe.products
-		create_row(list, ingredients, products, position)
+	if #filtered_assemblers > 0 then
+		-- add assemblers to list
+		for i, assembler in ipairs(filtered_assemblers) do
+			local position = assembler.position
+			local recipe = assembler.get_recipe()
+			local ingredients = recipe.ingredients
+			local products = recipe.products
+			create_row(list, ingredients, products, position)
+		end
+	else 
+		-- if list is still empty update text
+		local message_element = create_failed_search_message(list, player, filter)
+	end
+end
+
+-- creates a ui explaining the search for an item failed as well as next steps
+function create_failed_search_message(list, player, filter)
+	local search_history = global.players[player.index].trade_menu.search_history
+	local message_element = list.add{type="flow"}
+	local horizontal_flow = message_element.add{type="flow", direction="horizontal"}
+
+	-- main text
+	if filter.product ~= nil and filter.ingredient ~= nil then
+		horizontal_flow.add{type="label", caption="No recipes found."}
+	elseif filter.product ~= nil then
+		horizontal_flow.add{type="label", caption="No recipes create"}
+		horizontal_flow.add{type="label", caption=filter.product}
+	elseif filter.ingredient ~= nil then
+		horizontal_flow.add{type="label", caption="No recipes require"}
+		horizontal_flow.add{type="label", caption=filter.ingredient}
+	end
+
+	-- ending text
+	if #search_history > 0 then
+		message_element.add{type="label", caption='Try searching for something else. Or press "backspace" to see your last search!'}
+	else
+		message_element.add{type="label", caption="Try searching for something else!"}
 	end
 end
 
@@ -1148,6 +1178,10 @@ end
 
 -- updates the trade menu window search bar and search list based on search text
 function update_trade_menu_search(player, new_search, add_to_search_history)
+	if add_to_search_history then
+		add_term_to_player_search_history(player, new_search)
+	end
+
 	-- update search field
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
 	textfield.text = new_search
@@ -1167,11 +1201,7 @@ function update_trade_menu_search(player, new_search, add_to_search_history)
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
-	create_trade_menu_list_rows(trades_list, global.machine_entities, search_filter)
-
-	if add_to_search_history then
-		add_term_to_player_search_history(player, new_search)
-	end
+	create_trade_menu_list_rows(trades_list, global.machine_entities, search_filter, player)
 end
 
 -- opens players trade menu if closed; closes players trade menu if open
