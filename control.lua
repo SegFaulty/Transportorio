@@ -1228,20 +1228,8 @@ script.on_event(defines.events.on_lua_shortcut,
 script.on_event(defines.events.on_gui_text_changed,
 	function(event)
 		local player = game.get_player(event.player_index)
-		local search_filter = event.element.text
-		local sanitized_filter = string.gsub(search_filter, " ", "-")
-
-		if string.find(sanitized_filter,"product:" , 0, true) then
-			local filter = search_filter.gsub(search_filter, "product:", "")
-			filter_trade_menu(player, {ingredient=nil, product=filter})
-
-		elseif string.find(sanitized_filter,"ingredient:" , 0, true) then
-			local filter = search_filter.gsub(search_filter, "ingredient:", "")
-			filter_trade_menu(player, {ingredient=filter, product=nil})
-
-		else
-			filter_trade_menu(player, {ingredient=sanitized_filter, product=sanitized_filter})
-		end
+		local new_search = event.element.text
+		update_trade_menu_search(player, new_search)
 	end
 )
 
