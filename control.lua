@@ -1068,12 +1068,6 @@ function fill_trade_menu_list(list, machines, filter)
 	end
 end
 
-function filter_trade_menu(player, filter)
-	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
-	trades_list.clear()
-	fill_trade_menu_list(trades_list, global.machine_entities, filter)
-end
-
 function create_row(list, ingredients, products, position)
 	local trade_row = list.add{type="frame", style="tro_trade_row"}
 	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
