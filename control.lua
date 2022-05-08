@@ -1169,6 +1169,16 @@ function update_trade_menu_search(player, new_search, add_to_search_history)
 	end
 end
 
+-- opens players trade menu if closed; closes players trade menu if open
+function toggle_trade_menu(player)
+	local player_global = global.players[player.index]
+	if player_global.trade_menu.active == false then
+		open_trade_menu(player)
+	else
+		close_trade_menu(player)
+	end
+end
+
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
@@ -1208,13 +1218,7 @@ script.on_event(defines.events.on_lua_shortcut,
 	function(event)
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
-			local player_global = global.players[player.index]
-			if player_global.trade_menu.active == false then
-				open_trade_menu(player)
-			else
-				close_trade_menu(player)
-			end
-			
+			toggle_trade_menu(player)
 		end
 	end
 )
