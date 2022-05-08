@@ -1078,7 +1078,6 @@ function create_trade_menu_list_rows(list, machines, search_term, filter, player
 		end
 	end
 
-
 	if #filtered_assemblers > 0 then
 		-- create a row for each recipe for each assembler
 		for i, assembler in ipairs(filtered_assemblers) do
@@ -1126,7 +1125,8 @@ function create_row(list, ingredients, products, position)
 	
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
-			trade_row_flow.add{type="sprite-button", sprite = ingredient.type .. "/" .. ingredient.name, tags={action="tro_filter_list", item=ingredient.name, type="ingredient"}}
+			trade_row_flow.add{type="sprite-button", sprite = ingredient.type .. "/" .. ingredient.name, 
+				tags={action="tro_filter_list", item_name=ingredient.name, filter="ingredient", type=ingredient.type}}
 			trade_row_flow.add{type="label", caption = ingredient.amount}
 		end
 	end
@@ -1134,7 +1134,8 @@ function create_row(list, ingredients, products, position)
 	trade_row_flow.add{type="label", caption = " --->"}
 
 	for i, product in ipairs(products) do
-		trade_row_flow.add{type="sprite-button", sprite = product.type .. "/" .. product.name, tags={action="tro_filter_list", item=product.name, type="product"}}
+		trade_row_flow.add{type="sprite-button", sprite = product.type .. "/" .. product.name, 
+			tags={action="tro_filter_list", item_name=product.name, filter="product", type=product.type}}
 		trade_row_flow.add{type="label", caption = product.amount}
 	end
 end
@@ -1254,11 +1255,11 @@ script.on_event(defines.events.on_gui_click,
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
 			if event.button == 4 then -- right mouse button
-				local search_term = "ingredient:" .. event.element.tags.item
+				local search_term = "ingredient:" .. event.element.tags.item_name
 				update_trade_menu_search(player, search_term, true)
 
 			elseif event.button == 2 then -- left mouse button
-				local search_term = "product:" .. event.element.tags.item
+				local search_term = "product:" .. event.element.tags.item_name
 				update_trade_menu_search(player, search_term, true)
 			end
 		end
