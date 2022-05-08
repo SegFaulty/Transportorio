@@ -1196,20 +1196,15 @@ script.on_event(defines.events.on_gui_click,
 		elseif event.element.name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
 
+		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
 			if event.button == 4 then -- right mouse button
-				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
 				local search_term = "ingredient:" .. event.element.tags.item
-				textfield.text = search_term
-				filter_trade_menu(player, {ingredient=event.element.tags.item, product=nil})
-				add_term_to_player_search_history(player, search_term)
+				update_trade_menu_search(player, search_term, true)
 
 			elseif event.button == 2 then -- left mouse button
-				local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
 				local search_term = "product:" .. event.element.tags.item
-				textfield.text = search_term
-				filter_trade_menu(player, {ingredient=nil, product=event.element.tags.item})
-				add_term_to_player_search_history(player, search_term)
+				update_trade_menu_search(player, search_term, true)
 			end
 		end
 	end
