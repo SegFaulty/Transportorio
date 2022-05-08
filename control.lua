@@ -1144,11 +1144,11 @@ function move_backward_in_trade_menu_search_history(player)
 		new_search = search_history[1]
 	end
 
-	update_trade_menu_search(player, new_search)
+	update_trade_menu_search(player, new_search, false)
 end
 
--- updates the trade meny window search bar and search list based on search text
-function update_trade_menu_search(player, new_search)
+-- updates the trade menu window search bar and search list based on search text
+function update_trade_menu_search(player, new_search, add_to_search_history)
 	-- update search field
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
 	textfield.text = new_search
@@ -1169,6 +1169,10 @@ function update_trade_menu_search(player, new_search)
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
 	fill_trade_menu_list(trades_list, global.machine_entities, search_filter)
+
+	if add_to_search_history then
+		add_term_to_player_search_history(player, search_term)
+	end
 end
 
 script.on_event(defines.events.on_player_joined_game, 
@@ -1230,7 +1234,7 @@ script.on_event(defines.events.on_gui_text_changed,
 	function(event)
 		local player = game.get_player(event.player_index)
 		local new_search = event.element.text
-		update_trade_menu_search(player, new_search)
+		update_trade_menu_search(player, new_search, false)
 	end
 )
 
