@@ -1171,7 +1171,7 @@ function update_trade_menu_search(player, new_search, add_to_search_history)
 	fill_trade_menu_list(trades_list, global.machine_entities, search_filter)
 
 	if add_to_search_history then
-		add_term_to_player_search_history(player, search_term)
+		add_term_to_player_search_history(player, new_search)
 	end
 end
 
