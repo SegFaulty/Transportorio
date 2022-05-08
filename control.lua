@@ -1134,6 +1134,42 @@ function reset_search_history(player)
 	global.players[player.index].trade_menu.search_history = {}
 end
 
+function move_backward_in_trade_menu_search_history(player)
+	remove_last_added_term_from_player_search_history(player)
+	local search_history = global.players[player.index].trade_menu.search_history
+
+	local new_search = ""
+
+	if #search_history >= 1 then
+		new_search = search_history[1]
+	end
+
+	update_trade_menu_search(player, new_search)
+end
+
+function update_trade_menu_search(player, new_search)
+	-- update search field
+	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
+	textfield.text = new_search
+
+	-- convert search into proper data structure
+	local search_filter = {ingredient=nil, product=nil}
+	if string.find(new_search, "product:") then
+		local sanitized_filter = string.gsub(new_search, "product:", "")
+		search_filter.product = sanitized_filter
+	elseif string.find(new_search, "ingredient:") then
+		local sanitized_filter = string.gsub(new_search, "ingredient:", "")
+		search_filter.ingredient = sanitized_filter
+	else
+		search_filter = {ingredient=new_search, product=new_search}
+	end
+		
+	-- update trades list
+	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
+	trades_list.clear()
+	fill_trade_menu_list(trades_list, global.machine_entities, search_filter)
+end
+
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
@@ -1212,22 +1248,6 @@ script.on_event(defines.events.on_gui_text_changed,
 script.on_event("move_backwards_in_search_history",
 	function(event)
 		local player = game.get_player(event.player_index)
-		remove_last_added_term_from_player_search_history(player)
-		local search_history = global.players[player.index].trade_menu.search_history
-		if #search_history >= 1 then
-			game.print(#search_history)
-			local search_filter = search_history[1]
-			local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
-			textfield.text = search_filter
-			if string.find(search_filter, "product:") then
-				local filter = string.gsub(search_filter, "product:", "")
-				game.print(filter)
-				filter_trade_menu(player, {ingredient=nil, product=filter})
-			else
-				local filter = string.gsub(search_filter, "ingredient:", "")
-
-				filter_trade_menu(player, {ingredient=filter, product=nil})
-			end
-		end
+		move_backward_in_trade_menu_search_history(player)
 	end
 )
