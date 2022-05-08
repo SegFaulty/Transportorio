@@ -974,7 +974,11 @@ function update_map()
 		end	
 	end 
 end --end function
-
+--
+--
+-- GUI
+--
+--
 function close_trade_menu(player)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
@@ -998,7 +1002,7 @@ function open_trade_menu(player)
 	root_frame.add{type="textfield", name="tro_trade_menu_search"}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
-	fill_trade_menu_list(trades_list, global.machine_entities, {ingredient="", product=""})
+	create_trade_menu_list_rows(trades_list, global.machine_entities, {ingredient="", product=""})
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
@@ -1023,7 +1027,8 @@ function create_title_bar(root_element)
 	}
 end
 
-function fill_trade_menu_list(list, machines, filter)
+-- creates each trade row from the list of machines and a filter. then adds the rows onto the list
+function create_trade_menu_list_rows(list, machines, filter)
 	-- filter out machines that are not assemblers
 	local assemblers = {}
 	for x, machine in ipairs(machines) do
@@ -1162,7 +1167,7 @@ function update_trade_menu_search(player, new_search, add_to_search_history)
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
-	fill_trade_menu_list(trades_list, global.machine_entities, search_filter)
+	create_trade_menu_list_rows(trades_list, global.machine_entities, search_filter)
 
 	if add_to_search_history then
 		add_term_to_player_search_history(player, new_search)
