@@ -53,6 +53,7 @@ styles["tro_trade_row_flow"] = {
   vertical_align = "center"
 }
 
+-- trade menu shortcut
 data:extend({
   {
     type = "shortcut",
@@ -89,4 +90,14 @@ data:extend({
       size = 64
     },
   },
+})
+
+-- custom input / keybindings
+data:extend({
+  {
+    type = "custom-input",
+    name = "move_backwards_in_search_history",
+    key_sequence = "BACKSPACE",
+    action = "lua"
+  }
 })
