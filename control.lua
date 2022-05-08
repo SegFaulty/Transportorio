@@ -1147,6 +1147,7 @@ function move_backward_in_trade_menu_search_history(player)
 	update_trade_menu_search(player, new_search)
 end
 
+-- updates the trade meny window search bar and search list based on search text
 function update_trade_menu_search(player, new_search)
 	-- update search field
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
