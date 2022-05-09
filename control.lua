@@ -1213,6 +1213,11 @@ end
 function update_trade_menu_search(player, search, add_to_search_history, update_search_field)
 	update_search_field = update_search_field or false
 
+	-- if the trade menu isnt open you cant update it
+	if global.players[player.index].trade_menu.active == false then
+		return
+	end
+
 	if add_to_search_history then
 		add_term_to_player_search_history(player, search)
 	end
