@@ -1147,15 +1147,9 @@ end
 
 function add_term_to_player_search_history(player, search)
 	local search_history = global.players[player.index].trade_menu.search_history
-	
+	local history_length = #search_history
 	-- add search to search history
 	table.insert(search_history, 1, search)
-
-	-- get search history length
-	local history_length = 0
-	for i, search in ipairs(search_history) do
-		history_length = history_length + 1
-	end
 
 	-- dont add to search history if it hasnt changed (A,A,A,A,A,A)
 	if history_length >= 2 then
