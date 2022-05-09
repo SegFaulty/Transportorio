@@ -1094,25 +1094,25 @@ function create_trade_menu_list_rows(list, machines, search_term, filter, player
 		end
 	else 
 		-- if list is empty, create a message saying as much
-		local message_element = create_failed_search_message(list, player, filter)
+		local message_element = create_failed_search_message(list, player, filter, search_term)
 	end
 end
 
 -- creates a ui explaining the search for an item failed as well as next steps
-function create_failed_search_message(list, player, filter)
+function create_failed_search_message(list, player, filter, search_term)
 	local search_history = global.players[player.index].trade_menu.search_history
 	local message_element = list.add{type="flow"}
 	local horizontal_flow = message_element.add{type="flow", direction="horizontal"}
 
 	-- main text
-	if filter.product ~= nil and filter.ingredient ~= nil then
+	if filter == "any" then
 		horizontal_flow.add{type="label", caption="No recipes found."}
-	elseif filter.product ~= nil then
+	elseif filter == "product" then
 		horizontal_flow.add{type="label", caption="No recipes create"}
-		horizontal_flow.add{type="label", caption=filter.product}
-	elseif filter.ingredient ~= nil then
+		horizontal_flow.add{type="label", caption=search_term}
+	elseif filter == "ingredient" then
 		horizontal_flow.add{type="label", caption="No recipes require"}
-		horizontal_flow.add{type="label", caption=filter.ingredient}
+		horizontal_flow.add{type="label", caption=search_term}
 	end
 
 	-- ending text
