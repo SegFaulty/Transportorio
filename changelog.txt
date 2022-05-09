@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.0.6
+Date: 2022-05-09
+	- Updated trade GUI
+		- Added search history when using the sprite buttons to navigate trades. 
+			- Use backspace to go back in history. 
+			- No going forward in history.
+		- Added a simple message when a search has no recipes.
+---------------------------------------------------------------------------------------------------
 Version: 0.0.5
 Date: 2022-05-05
 	- Branched off from TradeRouteOverhaul into Transportorio
