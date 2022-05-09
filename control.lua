@@ -1,3 +1,30 @@
+-- Search = require("data.Search")
+local Search = {
+	filter="any", -- any, product, ingredient
+	searched_item="",
+	item_type="unknown"
+}
+
+-- create a new search table
+function Search:new(filter, searched_item, item_type)
+	item_type = item_type or self.item_type
+	search = {}
+	search = {filter=filter, searched_item=searched_item, item_type=item_type}
+	setmetatable(search, self)
+	self.__index = self
+
+	return search
+end
+
+-- checks if a search object has the same contents as itself.
+function Search:compare(search)
+	for key, value in pairs(search) do
+		if self[key] ~= value then
+			return false
+		end
+	end
+	return true
+end
 
 DEBUG = true -- Used for debug, users should not enable
 local debugCount = 0 -- Stops debugging messages
@@ -1046,19 +1073,22 @@ function create_trade_menu_list_rows(list, machines, search_term, filter, player
 		local recipe = assembler.get_recipe()
 
 		-- add any assemblers that have the searched term in their recipe
+		
 		if filter == "any" then 
 			for i, product in ipairs(recipe.products) do
 				if string.find(product.name, search_term, 0, true) then
-					goto add_item
+					table.insert(filtered_assemblers, assembler)
+					goto next_loop
 				end
 			end
 			for i, ingredient in ipairs(recipe.ingredients) do
 				if string.find(ingredient.name, search_term, 0, true) then
-					goto add_item
+					table.insert(filtered_assemblers, assembler)
+					goto next_loop
 				end
 			end
-			::add_item::
-			table.insert(filtered_assemblers, assembler)
+			
+			
 
 		-- add assemblers where they produce the searched term
 		elseif filter == "product" then
@@ -1076,6 +1106,7 @@ function create_trade_menu_list_rows(list, machines, search_term, filter, player
 				end
 			end
 		end
+		::next_loop::
 	end
 
 	if #filtered_assemblers > 0 then
@@ -1140,31 +1171,43 @@ function create_row(list, ingredients, products, position)
 	end
 end
 
-function add_term_to_player_search_history(player, search_item)
-	local history = global.players[player.index].trade_menu.search_history
-	local history_length = #history
+function add_term_to_player_search_history(player, search)
+	local search_history = global.players[player.index].trade_menu.search_history
+	
+	-- add search to search history
+	table.insert(search_history, 1, search)
+
+	-- get search history length
+	local history_length = 0
+	for i, search in ipairs(search_history) do
+		history_length = history_length + 1
+	end
+
+	-- dont add to search history if it hasnt changed (A,A,A,A,A,A)
+	if history_length >= 2 then
+		if search:compare(search_history[2]) then
+			table.remove(search_history, 2)
+		end
+	end
 
 	-- prevent repeating history (A,B,A,B,A,B) by removing second last if it matches new search
-	if search_item == history[2] then
-		table.remove(history, 2)
-		table.insert(history, 1, search_item)
-
-	-- dont add to history if it hasnt changed
-	elseif search_item ~= history[1] then
-		table.insert(history, 1, search_item)
+	if history_length >= 3 then
+		if search:compare(search_history[3]) then
+			table.remove(search_history, 3)
+		end
 	end
 
 	-- stop history from going past max size for performance
 	if history_length >= 100 then
-		table.remove(history, history_length) -- remove oldest search term
+		table.remove(search_history, history_length) -- remove oldest search term
 	end
 
-	-- debug, prints out search history
-		-- local history_string = ""
-		-- for i, search_term in ipairs(history) do
-		-- 	history_string = history_string .. ", " .. search_term
-		-- end
-		-- game.print(history_string)
+	--debug, prints out search history
+	-- local history_string = ""
+	-- for i, search_term in ipairs(search_history) do
+	-- 	history_string = history_string .. ", " .. search_term.searched_item
+	-- end
+	-- game.print("search history" .. history_string)
 end
 
 function remove_last_added_term_from_player_search_history(player)
@@ -1184,41 +1227,34 @@ function move_backward_in_trade_menu_search_history(player)
 	remove_last_added_term_from_player_search_history(player)
 	local search_history = global.players[player.index].trade_menu.search_history
 
-	local new_search = ""
+	local new_search = Search:new("any", "")
+
 
 	if #search_history >= 1 then
 		new_search = search_history[1]
 	end
 
-	update_trade_menu_search(player, new_search, false)
+	update_trade_menu_search(player, new_search, false, true)
 end
 
 -- updates the trade menu window search bar and search list based on search text
-function update_trade_menu_search(player, searched_term, add_to_search_history)
+function update_trade_menu_search(player, search, add_to_search_history, update_search_field)
+	update_search_field = update_search_field or false
+
 	if add_to_search_history then
-		add_term_to_player_search_history(player, searched_term)
+		add_term_to_player_search_history(player, search)
 	end
 
 	-- update search field
-	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
-	textfield.text = searched_term
-
-	-- convert search into proper data structure
-	local search_filter = ""
-	if string.find(searched_term, "product:") then
-		searched_term = string.gsub(searched_term, "product:", "")
-		search_filter = "product"
-	elseif string.find(searched_term, "ingredient:") then
-		searched_term = string.gsub(searched_term, "ingredient:", "")
-		search_filter = "ingredient"
-	else
-		search_filter = "any"
+	if update_search_field then
+		local textfield = player.gui.screen["tro_trade_root_frame"]["tro_trade_menu_search"]
+		textfield.text = search.filter .. ":" .. search.searched_item
 	end
 		
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
-	create_trade_menu_list_rows(trades_list, global.machine_entities, searched_term, search_filter, player)
+	create_trade_menu_list_rows(trades_list, global.machine_entities, search.searched_item, search.filter, player)
 end
 
 -- opens players trade menu if closed; closes players trade menu if open
@@ -1229,6 +1265,27 @@ function toggle_trade_menu(player)
 	else
 		close_trade_menu(player)
 	end
+end
+
+function convert_search_text_to_search_object(text)
+	local filter = ""
+	local searched_item = text
+	index_start, index_end = string.find(text, ":")
+
+	-- parse text into data
+	if index_end == nil then -- no filter
+		filter = "any"
+	else
+		filter = string.sub(text, 1, index_end - 1)
+		searched_item = string.sub(text, index_end + 1, -1)
+	end
+
+	searched_item = string.gsub(searched_item, " ", "-")
+
+	-- turn data into search obj
+	local search1 = Search:new(filter, searched_item)
+
+	return search1
 end
 
 script.on_event(defines.events.on_player_joined_game, 
@@ -1254,14 +1311,14 @@ script.on_event(defines.events.on_gui_click,
 
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
+			local tag = event.element.tags
+			local search = {}
 			if event.button == 4 then -- right mouse button
-				local search_term = "ingredient:" .. event.element.tags.item_name
-				update_trade_menu_search(player, search_term, true)
-
+				search = Search:new("ingredient", tag.item_name, tag.type)
 			elseif event.button == 2 then -- left mouse button
-				local search_term = "product:" .. event.element.tags.item_name
-				update_trade_menu_search(player, search_term, true)
+				search = Search:new("product", tag.item_name)
 			end
+			update_trade_menu_search(player, search, true, true)
 		end
 	end
 )
@@ -1279,7 +1336,7 @@ script.on_event(defines.events.on_gui_text_changed,
 	function(event)
 		local player = game.get_player(event.player_index)
 		local new_search = event.element.text
-		update_trade_menu_search(player, new_search, false)
+		update_trade_menu_search(player, convert_search_text_to_search_object(new_search), false)
 	end
 )
 
