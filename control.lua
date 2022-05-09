@@ -1109,10 +1109,14 @@ function create_failed_search_message(list, player, filter, search_term)
 		horizontal_flow.add{type="label", caption="No recipes found."}
 	elseif filter == "product" then
 		horizontal_flow.add{type="label", caption="No recipes create"}
+		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
 		horizontal_flow.add{type="label", caption=search_term}
 	elseif filter == "ingredient" then
 		horizontal_flow.add{type="label", caption="No recipes require"}
+		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
 		horizontal_flow.add{type="label", caption=search_term}
+	else
+		horizontal_flow.add{type="label", caption="Unknown filter!"}
 	end
 
 	-- ending text
