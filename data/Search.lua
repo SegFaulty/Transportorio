@@ -7,7 +7,6 @@ local Search = {
 -- create a new search table
 function Search:new(filter, searched_item, item_type)
 	item_type = item_type or self.item_type
-	search = {}
 	search = {filter=filter, searched_item=searched_item, item_type=item_type}
 	setmetatable(search, self)
 	self.__index = self
