@@ -40,7 +40,19 @@ function Trades_menu:open(player)
 	self.active = not self.active
 end
 
+-- closes gui and resets search history
 function Trades_menu:close(player)
+	self:destroy(player)
+	self.search_history:reset()
+end
+
+-- closes gui without reseting search history
+function Trades_menu:minimize(player)
+	self:destroy(player)
+end
+
+-- destroys the root gui element and all its child elements
+function Trades_menu:destroy(player)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
 	local main_frame = screen_element["tro_trade_root_frame"]
