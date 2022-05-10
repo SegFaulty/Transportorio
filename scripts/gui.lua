@@ -31,6 +31,7 @@ function Trades_menu:open(player)
 	self:create_title_bar(root_frame)
 
 	root_frame.add{type="textfield", name="tro_trade_menu_search"}
+	root_frame.add{type="button", caption="back", name="tro_move_back_in_search_history_button"}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
 	if #self.search_history >= 1 then

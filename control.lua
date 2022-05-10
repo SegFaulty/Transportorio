@@ -1031,6 +1031,8 @@ script.on_event(defines.events.on_gui_click,
 				search = Search:new("product", tag.item_name)
 			end
 			player_global.trades_menu:update_search(player, search, true, true)
+		elseif event.element.name == "tro_move_back_in_search_history_button" then
+			player_global.trades_menu:move_backward_in_search_history(player)
 		end
 	end
 )
