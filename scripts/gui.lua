@@ -33,7 +33,14 @@ function Trades_menu:open(player)
 	root_frame.add{type="textfield", name="tro_trade_menu_search"}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
-	self:create_list_rows(trades_list, global.machine_entities, "", "any", player)
+	if #self.search_history >= 1 then
+		local search_term = self.search_history[1].searched_item
+		local filter = self.search_history[1].filter
+		self:create_list_rows(trades_list, global.machine_entities, search_term, filter, player)
+	else
+		-- search for all
+		self:create_list_rows(trades_list, global.machine_entities, "", "any", player)
+	end
 	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
@@ -61,7 +68,6 @@ function Trades_menu:destroy(player)
 
 	-- update players state
 	self.active = not self.active
-	self.search_history:reset()
 end
 
 -- updates the trade menu window search bar and search list based on search text
