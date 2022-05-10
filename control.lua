@@ -1,5 +1,5 @@
 Search = require("data.Search")
-require("scripts.gui")
+Trade_menu = require("scripts.gui")
 
 DEBUG = true -- Used for debug, users should not enable
 local debugCount = 0 -- Stops debugging messages
@@ -1007,10 +1007,7 @@ script.on_event(defines.events.on_player_joined_game,
 	function(event)
 		local player = game.get_player(event.player_index)
 		global.players[player.index] = {
-			trade_menu = {
-				active = false,
-				search_history = {}
-			}
+			trades_menu = Trade_menu:new()
 		}
 	end
 )
@@ -1018,8 +1015,9 @@ script.on_event(defines.events.on_player_joined_game,
 script.on_event(defines.events.on_gui_click,
 	function(event)
 		local player = game.get_player(event.player_index)
+		local player_global = global.players[player.index]
 		if event.element.name == "tro_trade_menu_header_exit_button" then
-			close_trade_menu(player)
+			player_global.trades_menu:close(player)
 
 		elseif event.element.name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
@@ -1033,7 +1031,7 @@ script.on_event(defines.events.on_gui_click,
 			elseif event.button == 2 then -- left mouse button
 				search = Search:new("product", tag.item_name)
 			end
-			update_trade_menu_search(player, search, true, true)
+			player_global.trades_menu:update_search(player, search, true, true)
 		end
 	end
 )
@@ -1042,7 +1040,7 @@ script.on_event(defines.events.on_lua_shortcut,
 	function(event)
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
-			toggle_trade_menu(player)
+			global.players[player.index].trades_menu:toggle(player)
 		end
 	end
 )
@@ -1050,14 +1048,16 @@ script.on_event(defines.events.on_lua_shortcut,
 script.on_event(defines.events.on_gui_text_changed,
 	function(event)
 		local player = game.get_player(event.player_index)
+		local player_global = global.players[player.index]
 		local new_search = event.element.text
-		update_trade_menu_search(player, convert_search_text_to_search_object(new_search), false)
+		player_global.trades_menu:update_search(player, convert_search_text_to_search_object(new_search), false)
 	end
 )
 
 script.on_event("move_backwards_in_search_history",
 	function(event)
 		local player = game.get_player(event.player_index)
-		move_backward_in_trade_menu_search_history(player)
+		local player_global = global.players[player.index]
+		player_global.trades_menu:move_backward_in_search_history(player)
 	end
 )
