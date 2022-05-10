@@ -976,11 +976,6 @@ function update_map()
 		end	
 	end 
 end --end function
---
---
--- GUI
---
---
 
 function convert_search_text_to_search_object(text)
 	local filter = ""
@@ -1021,6 +1016,10 @@ script.on_event(defines.events.on_gui_click,
 
 		elseif event.element.name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
+
+		elseif event.element.name == "tro_goto_button" then
+			player.zoom_to_world(event.element.tags.location, 1)
+			player_global.trades_menu:close(player)
 
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
