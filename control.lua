@@ -1019,7 +1019,7 @@ script.on_event(defines.events.on_gui_click,
 
 		elseif event.element.name == "tro_goto_button" then
 			player.zoom_to_world(event.element.tags.location, 1)
-			player_global.trades_menu:close(player)
+			player_global.trades_menu:minimize(player)
 
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
