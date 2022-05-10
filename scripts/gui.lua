@@ -195,6 +195,7 @@ function Trades_menu:create_row(list, ingredients, products, position)
 	local trade_row = list.add{type="frame", style="tro_trade_row"}
 	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
 	trade_row_flow.add{type="button", caption="ping", name="tro_ping_button", tags={location=position}}
+	trade_row_flow.add{type="button", caption="goto", name="tro_goto_button", tags={location=position}}
 	
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
