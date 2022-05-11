@@ -13,11 +13,31 @@ function City:new(surface, chunk)
 	setmetatable(city, self)
 	self.__index = self
 
+	-- get a random area
 	local city_center = city:get_random_location(chunk)
+
+	-- return if city too close
+	if City:check_for_nearby_cities(surface, city_center) then return nil end
+
 	city.center = city_center
 	city:spawn_city(surface, city_center)
 
 	return city
+end
+
+-- check surroundings for another city
+function City:check_for_nearby_cities(surface, center)
+	traders = surface.find_entities_filtered{
+		position = center,
+		type = "assembling-machine",
+		radius = minimum_city_distance
+	}
+	-- if a trader is found
+	if next(traders) ~= nil then 
+		return true 
+	else 
+		return false
+	end
 end
 
 -- returns a random location in an area
@@ -90,11 +110,7 @@ function City:create_city_building(surface, entity_prototype_name, search_center
 end
 
 function City:spawn_city (surface, center)
-	
-	-- check surroundings for another city
-	traders = game.surfaces[1].find_entities_filtered{position = center, type = "assembling-machine", radius = minimum_city_distance}
-	if next(traders) ~= nil then return end
-	
+
 	-- search around the city center for obstacles and remove them
 	local area = {{center.x-20,center.y-20},{center.x+20,center.y+20}}
 	for index, entity in pairs(game.surfaces[1].find_entities(area)) do
@@ -181,7 +197,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y +math.floor((i-1)/5)*8+8}
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.malls, building)
 		end
 	end
 	
@@ -193,7 +209,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((10-1)%5)*8-16 , center.y +math.floor((10-1)/5)*8+8 }
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -204,21 +220,21 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x  , center.y}
 		local building = self:create_city_building(surface, "rocket-silo", search_center, {x=14, y=14})
 		if building ~= nil then
-			table.insert(global.machine_entities, new_entity)
+			table.insert(self.buildings.other, new_entity)
 			record_city(7, building.position, science_city)
 		end
 	end
 
 	if city_tier == 4 and buildingtype == "assembling-machine-1" then buildingtype = "assembling-machine-2" end
 
-	-- create a science lab
+	-- create an assembly machine that produces science
 	local r = math.floor( 21*math.log(2*(69+30*city_tier+item_values[city_tier][ #item_values[city_tier]-1 ])/(69+30*city_tier+item_values[city_tier][ #item_values[city_tier] ]))/math.log(4) )
 	local chosen_recipe = "T"..city_tier.."-Science-"..r
 	local search_center = {center.x +16  , center.y  }
 	local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 	if building ~= nil then
 		record_city(city_tier, building.position, science_city)
-		table.insert(global.machine_entities, building)
+		table.insert(self.buildings.traders, building)
 	end
 
 	-- uptier trades 1 // wtf does this mean? MASON WHAT DO THE NUMBERS MEAN?
@@ -249,7 +265,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}		
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -278,7 +294,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}		
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -304,11 +320,11 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}		
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
-	--science 2 // my guess is this decides if a second science lab generates
+	--science 2 // creates assembler that makes science pots
 	if city_tier2~=city_tier then
 		if city_tier2 == 4 and buildingtype=="assembling-machine-1" then buildingtype = "assembling-machine-2" end
 		
@@ -317,7 +333,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x -16  , center.y}		
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 
@@ -346,7 +362,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -375,7 +391,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -401,7 +417,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x +((i-1)%5)*8-16 , center.y -math.floor((i-1)/5)*8-8}
 		local building = self:create_city_building(surface, buildingtype, search_center, {x=8, y=8}, {recipe=chosen_recipe})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.traders, building)
 		end
 	end
 	
@@ -410,7 +426,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x-8  , center.y}
 		local building = self:create_city_building(surface, "beacon", search_center, {x=8, y=8})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.other, building)
 		end
 	end
 	
@@ -428,7 +444,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x  , center.y}
 		local building = self:create_city_building(surface, "lab", search_center, {x=8, y=8})
 		if building ~= nil then
-			table.insert(global.machine_entities, building)
+			table.insert(self.buildings.other, building)
 		end
 	end
 

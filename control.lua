@@ -80,18 +80,21 @@ global.bad_trade_map = {
 	{ {}, {}, {}, {}, {}, {}, {} } 
 }
 
+
 --spawn cities on chunk generation
 script.on_event({defines.events.on_chunk_generated},
    function (event)
 		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end
 		local city_center = event.area
 		local surface = event.surface
-		City:new(surface, city_center)
+		local city = City:new(surface, city_center)
+		table.insert(global.cities, city)
 	end
 )
 
 script.on_init(function()
 	global.players = {}
+	global.cities = {}
 	-- removed crashsite and cutscene start, so on_player_created inventory safe
 	remote.call("freeplay", "set_disable_crashsite", true)  
 	

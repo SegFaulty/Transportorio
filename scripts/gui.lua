@@ -42,10 +42,10 @@ function Trades_menu:open(player)
 	if #self.search_history >= 1 then
 		local search_term = self.search_history[1].searched_item
 		local filter = self.search_history[1].filter
-		self:create_list_rows(trades_list, global.machine_entities, search_term, filter, player)
+		self:create_list_rows(trades_list, global.cities, search_term, filter, player)
 	else
 		-- search for all
-		self:create_list_rows(trades_list, global.machine_entities, "", "any", player)
+		self:create_list_rows(trades_list, global.cities, "", "any", player)
 	end
 	
 	root_frame.style.size = {800, 700}
@@ -98,7 +98,7 @@ function Trades_menu:update_search(player, search, add_to_search_history, update
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
-	self:create_list_rows(trades_list, global.machine_entities, search.searched_item, search.filter, player)
+	self:create_list_rows(trades_list, global.cities, search.searched_item, search.filter, player)
 end
 
 function Trades_menu:create_title_bar(root_element)
@@ -119,17 +119,27 @@ function Trades_menu:create_title_bar(root_element)
 end
 
 -- creates each trade row from the list of machines and a filter. then adds the rows onto the list
-function Trades_menu:create_list_rows(list, machines, search_term, filter, player)
+function Trades_menu:create_list_rows(list, cities, search_term, filter, player)
 
-	-- filter out machines that are not assemblers
 	local assemblers = {}
-	for x, machine in ipairs(machines) do
-		if machine.name == "assembling-machine-1" 
-		or machine.name == "assembling-machine-2" 
-		or machine.name == "assembling-machine-3" then
-			table.insert(assemblers, machine)		
+	local cities_len = 0
+	local trades = 0
+	local malls = 0
+	for i, city in ipairs(cities) do
+		cities_len = cities_len + 1
+		for x, building in ipairs(city.buildings.traders) do
+			table.insert(assemblers, building)
+			trades = trades + 1
 		end
+		for x, building in ipairs(city.buildings.malls) do
+			table.insert(assemblers, building)
+			malls = malls + 1
+		end 
 	end
+
+	game.print("cities " .. cities_len)
+	game.print("trades ".. trades)
+	game.print("malls ".. malls)
 
 	-- filter assemblers according to filter
 	local filtered_assemblers = {}
