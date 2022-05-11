@@ -1,6 +1,6 @@
 Search = require("data.Search")
 Trade_menu = require("scripts.gui")
-require("scripts.city_generation")
+City = require("scripts.city_generation")
 
 DEBUG = true -- Used for debug, users should not enable
 local debugCount = 0 -- Stops debugging messages
@@ -84,7 +84,7 @@ global.bad_trade_map = {
 script.on_event({defines.events.on_chunk_generated},
    function (e)
 		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end
-		spawn_city(e)
+		City:new(e)
 	end
 )
 
