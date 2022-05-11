@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.0.7
+Date: 2022-05-11
+  Updated trades GUI:
+	- Added "goto" button. Similar to the ping button but opens the map onto the trade location.
+	- Added a back button for search history.
+	- Added a new keyboard shortcut. Shift + T to open trades menu.
+	- Added en localisation for keyboard shortcuts (i didnt realize that was a thing before).
+	- Added tooltips to most elements in the trades menu.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.0.6
 Date: 2022-05-09
 	- Updated trade GUI
