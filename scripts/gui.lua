@@ -30,8 +30,13 @@ function Trades_menu:open(player)
 
 	self:create_title_bar(root_frame)
 
-	root_frame.add{type="textfield", name="tro_trade_menu_search"}
-	root_frame.add{type="button", caption="back", name="tro_move_back_in_search_history_button"}
+	root_frame.add{type="textfield", name="tro_trade_menu_search", tooltip = {"tro.trade_menu_textfield"}}
+	root_frame.add{
+		type="button",
+		caption="back",
+		name="tro_move_back_in_search_history_button",
+		tooltip = {"tro.trade_menu_back_but"}
+	}
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical"}
 
 	if #self.search_history >= 1 then
@@ -109,8 +114,7 @@ function Trades_menu:create_title_bar(root_element)
 		style = "frame_action_button",
 		sprite = "utility/close_white",
 		hovered_sprite = "utility/close_black",
-		clicked_sprite = "utility/close_black",
-		tooltip = {"gui.close-instruction"}
+		clicked_sprite = "utility/close_black"
 	}
 end
 
@@ -213,13 +217,33 @@ end
 function Trades_menu:create_row(list, ingredients, products, position)
 	local trade_row = list.add{type="frame", style="tro_trade_row"}
 	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
-	trade_row_flow.add{type="button", caption="ping", name="tro_ping_button", tags={location=position}}
-	trade_row_flow.add{type="button", caption="goto", name="tro_goto_button", tags={location=position}}
+	trade_row_flow.add{
+		type="button",
+		caption="ping",
+		name="tro_ping_button",
+		tags={location=position}, 
+		tooltip={"tro.trade_menu_ping"}
+	}
+	trade_row_flow.add{type="button",
+		caption="goto",
+		name="tro_goto_button",
+		tags={location=position},
+		tooltip={"tro.trade_menu_goto"}
+	}
 	
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
-			trade_row_flow.add{type="sprite-button", sprite = ingredient.type .. "/" .. ingredient.name, 
-				tags={action="tro_filter_list", item_name=ingredient.name, filter="ingredient", type=ingredient.type}}
+			trade_row_flow.add{
+				type="sprite-button",
+				sprite = ingredient.type .. "/" .. ingredient.name, 
+				tags={
+					action="tro_filter_list",
+					item_name=ingredient.name,
+					filter="ingredient",
+					type=ingredient.type
+				},
+				tooltip={"", {"tro.item_name"}, ": ", ingredient.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
+			}
 			trade_row_flow.add{type="label", caption = ingredient.amount}
 		end
 	end
@@ -227,8 +251,17 @@ function Trades_menu:create_row(list, ingredients, products, position)
 	trade_row_flow.add{type="label", caption = " --->"}
 
 	for i, product in ipairs(products) do
-		trade_row_flow.add{type="sprite-button", sprite = product.type .. "/" .. product.name, 
-			tags={action="tro_filter_list", item_name=product.name, filter="product", type=product.type}}
+		trade_row_flow.add{
+			type="sprite-button",
+			sprite = product.type .. "/" .. product.name, 
+			tags={
+				action="tro_filter_list",
+				item_name=product.name,
+				filter="product", 
+				type=product.type
+			},
+			tooltip={"", {"tro.item_name"}, ": ", product.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
+		}
 		trade_row_flow.add{type="label", caption = product.amount}
 	end
 end
