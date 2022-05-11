@@ -43,22 +43,7 @@ end
 
 --control.lua
 global.machine_entities={}
-global.machine_pointer = 1
-global.city_locations={}
 global.city_need_map={}
---on_chunk_generated
---Called when a chunk is generated.
---Contains
---area :: BoundingBox: Area of the chunk
---surface :: LuaSurface: The surface the chunk is on
---cities
-cities = {
-	"assembling-machine-1",
-	"assembling-machine-2",
-	"assembling-machine-3"
-}
-
-minimum_city_distance = 100
 minimum_city_distance = settings.global["minimum-city-distance"].value
 
 cycles = { {1,2,3,4}, {1,2,3,4,5}, {1,2,3,4,5,6}, {{1,3,5},{2,4,6}}, {1,2,3,4,5,6,7}, {1,2,3,4,5,6,7} }
@@ -313,7 +298,6 @@ end
 
 
 function record_city(tier, loc, science)
-	--table.insert(global.city_locations, {loc=loc,tier=tier, mapped = false, road=false, science= science})
 	table.insert(global.city_need_map, {loc=loc, tier=tier, science= science})
 end
 
