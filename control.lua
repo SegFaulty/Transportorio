@@ -82,9 +82,11 @@ global.bad_trade_map = {
 
 --spawn cities on chunk generation
 script.on_event({defines.events.on_chunk_generated},
-   function (e)
+   function (event)
 		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end
-		City:new(e)
+		local city_center = event.area
+		local surface = event.surface
+		City:new(surface, city_center)
 	end
 )
 

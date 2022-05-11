@@ -8,14 +8,24 @@ local City = {
 	}
 }
 
-function City:new(event)
+function City:new(surface, chunk)
 	local city = {}
 	setmetatable(city, self)
 	self.__index = self
 
-	city:spawn_city(event)
+	local city_center = city:get_random_location(chunk)
+	city.center = city_center
+	city:spawn_city(surface, city_center)
 
 	return city
+end
+
+-- returns a random location in an area
+function City:get_random_location(area)
+	local center = {}
+	center.x = area.right_bottom.x - math.random(0,31)
+	center.y = area.right_bottom.y - math.random(0,31)
+	return center
 end
 
 -- creates any building that doesnt have specific attributes
@@ -79,13 +89,7 @@ function City:create_city_building(surface, entity_prototype_name, search_center
 	return new_entity
 end
 
-function City:spawn_city (e)
-	local surface = e.surface
-
-	-- choose a random location in a chunk for the city center
-	local center = {}
-	center.x = e.area.right_bottom.x - math.random(0,31)
-	center.y = e.area.right_bottom.y - math.random(0,31)
+function City:spawn_city (surface, center)
 	
 	-- check surroundings for another city
 	traders = game.surfaces[1].find_entities_filtered{position = center, type = "assembling-machine", radius = minimum_city_distance}
