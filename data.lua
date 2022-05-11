@@ -23,6 +23,7 @@ require("prototypes.log1")
 require("prototypes.malls")
 require("prototypes.productivity")
 require("prototypes.research")
+require("prototypes.keybindings")
 
 data.raw["character"]["character"].reach_distance = 25
 data.raw["beacon"]["beacon"].supply_area_distance = 25
@@ -92,12 +93,3 @@ data:extend({
   },
 })
 
--- custom input / keybindings
-data:extend({
-  {
-    type = "custom-input",
-    name = "move_backwards_in_search_history",
-    key_sequence = "BACKSPACE",
-    action = "lua"
-  }
-})
