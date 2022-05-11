@@ -1055,10 +1055,18 @@ script.on_event(defines.events.on_gui_text_changed,
 	end
 )
 
-script.on_event("move_backwards_in_search_history",
+script.on_event("tro_move_backwards_in_search_history",
 	function(event)
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		player_global.trades_menu:move_backward_in_search_history(player)
+	end
+)
+
+script.on_event("tro_toggle_trade_menu",
+	function(event)
+		local player = game.get_player(event.player_index)
+		local player_global = global.players[player.index]
+		player_global.trades_menu:toggle(player)
 	end
 )
