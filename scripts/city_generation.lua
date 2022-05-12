@@ -9,7 +9,15 @@ local City = {
 }
 
 function City:new(surface, chunk)
-	local city = {}
+	local city = {	
+		center = nil, -- center location of the city
+		tier = nil, -- city tier
+		buildings = {
+			traders = {}, -- buildings that trade a product for another
+			malls = {}, -- trade for building supplies
+			other = {} -- rockets, beacons, labs, etc
+		}
+	}
 	setmetatable(city, self)
 	self.__index = self
 
