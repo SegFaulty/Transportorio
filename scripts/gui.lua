@@ -122,24 +122,15 @@ end
 function Trades_menu:create_list_rows(list, cities, search_term, filter, player)
 
 	local assemblers = {}
-	local cities_len = 0
-	local trades = 0
-	local malls = 0
+
 	for i, city in ipairs(cities) do
-		cities_len = cities_len + 1
 		for x, building in ipairs(city.buildings.traders) do
 			table.insert(assemblers, building)
-			trades = trades + 1
 		end
 		for x, building in ipairs(city.buildings.malls) do
 			table.insert(assemblers, building)
-			malls = malls + 1
 		end 
 	end
-
-	game.print("cities " .. cities_len)
-	game.print("trades ".. trades)
-	game.print("malls ".. malls)
 
 	-- filter assemblers according to filter
 	local filtered_assemblers = {}
