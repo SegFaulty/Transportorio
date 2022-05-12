@@ -88,7 +88,9 @@ script.on_event({defines.events.on_chunk_generated},
 		local city_center = event.area
 		local surface = event.surface
 		local city = City:new(surface, city_center)
-		table.insert(global.cities, city)
+		if city ~= nil then
+			table.insert(global.cities, city)
+		end
 	end
 )
 
