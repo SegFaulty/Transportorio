@@ -24,6 +24,7 @@ require("prototypes.productivity")
 require("prototypes.research")
 require("prototypes.keybindings")
 require("data.styles")
+require("prototypes.shortcuts")
 
 data.raw["character"]["character"].reach_distance = 25
 data.raw["beacon"]["beacon"].supply_area_distance = 25
@@ -35,43 +36,3 @@ data.raw["module"]["productivity-module-3"].effect.productivity.bonus = 0.05
 data.raw["module"]["productivity-module"  ].effect.speed.bonus = -0.1
 --data.raw["module"]["productivity-module-2"].effect.speed.bonus = -0.15
 data.raw["module"]["productivity-module-3"].effect.speed.bonus = -0.25
-
--- trade menu shortcut
-data:extend({
-  {
-    type = "shortcut",
-    name = "trades",
-    toggleable = true,
-    localised_name = { "tro.shortcut_name"},
-    order = "a",
-    action = "lua",
-    icon = {
-      filename = "__Transportorio__/graphics/icons/t.png",
-      flags = {
-        "icon"
-      },
-      priority = "extra-high-no-scale",
-      scale = 2,
-      size = 64
-    },
-    small_icon = {
-      filename = "__Transportorio__/graphics/icons/t.png",
-      flags = {
-        "icon"
-      },
-      priority = "extra-high-no-scale",
-      scale = 1,
-      size = 64
-    },
-    disabled_small_icon = {
-      filename = "__Transportorio__/graphics/icons/t.png",
-      flags = {
-        "icon"
-      },
-      priority = "extra-high-no-scale",
-      scale = 1,
-      size = 64
-    },
-  },
-})
-
