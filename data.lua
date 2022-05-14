@@ -12,7 +12,6 @@ end
 
 
 --data.lua
-
 require("prototypes.tiers")
 require("prototypes.cross_city_trades")
 require("prototypes.power")
@@ -24,6 +23,7 @@ require("prototypes.malls")
 require("prototypes.productivity")
 require("prototypes.research")
 require("prototypes.keybindings")
+require("data.styles")
 
 data.raw["character"]["character"].reach_distance = 25
 data.raw["beacon"]["beacon"].supply_area_distance = 25
@@ -36,33 +36,15 @@ data.raw["module"]["productivity-module"  ].effect.speed.bonus = -0.1
 --data.raw["module"]["productivity-module-2"].effect.speed.bonus = -0.15
 data.raw["module"]["productivity-module-3"].effect.speed.bonus = -0.25
 
-local styles = data.raw["gui-style"].default
-
-styles["tro_trades_list"] = {
-    type = "scroll_pane_style",
-    horizontally_stretchable = "on"
-}
-
-styles["tro_trade_row"] = {
-    type = "frame_style",
-    horizontally_stretchable = "on",
-}
-
-styles["tro_trade_row_flow"] = {
-  type = "horizontal_flow_style",
-  horizontally_stretchable = "on",
-  vertical_align = "center"
-}
-
 -- trade menu shortcut
 data:extend({
   {
     type = "shortcut",
     name = "trades",
+    toggleable = true,
     localised_name = { "tro.shortcut_name"},
     order = "a",
     action = "lua",
-    style = "green",
     icon = {
       filename = "__Transportorio__/graphics/icons/t.png",
       flags = {
