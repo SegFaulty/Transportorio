@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.0.8
+Date: 2022-05-14
+  Added:
+  - New filter option group. Groups trades by the city they originate from
+  - New filter option malls. Show / hide each cities mall trades (trades that return an item for construction like a belt and cant be traded further)
+  - New filter option trades. Show / hide each cities trades (anything thats not a mall trade)
+
+  Changed:
+  - Shortcut button color changed from green to default gray.
+  - Shortcut button stays highlighted when selected.
+
+  Fixed:
+  - Trade menu stops working after loading a save
+---------------------------------------------------------------------------------------------------
 Version: 0.0.7
 Date: 2022-05-11
   Updated trades GUI:
