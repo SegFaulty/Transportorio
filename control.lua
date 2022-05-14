@@ -488,11 +488,15 @@ script.on_event("tro_toggle_trade_menu",
 
 script.on_load(
 	function()
-		-- re-setup metatables
-		local player_trades_menu = global.players[1].trades_menu
-		Trade_menu:reset_metatable(player_trades_menu)
-		local player_search_history = player_trades_menu.search_history
-		Search_history:reset_metatable(player_search_history)
+		-- re-setup metatables 
+		for i, player in ipairs(global.players) do
+			local player_trades_menu = player.trades_menu
+			if player_trades_menu == nil then break end
+			Trade_menu:reset_metatable(player_trades_menu)
 
+			local player_search_history = player_trades_menu.search_history
+			if player_search_history == nil then break end
+			Search_history:reset_metatable(player_search_history)
+		end
 	end
 )
