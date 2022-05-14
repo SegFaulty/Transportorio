@@ -228,7 +228,7 @@ function City:spawn_city (surface, center)
 		local search_center = {center.x  , center.y}
 		local building = self:create_city_building(surface, "rocket-silo", search_center, {x=14, y=14})
 		if building ~= nil then
-			table.insert(self.buildings.other, new_entity)
+			table.insert(self.buildings.other, building)
 			record_city(7, building.position, science_city)
 		end
 	end
