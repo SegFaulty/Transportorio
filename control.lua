@@ -419,16 +419,32 @@ script.on_event(defines.events.on_gui_click,
 			player.zoom_to_world(event.element.tags.location, 1)
 			player_global.trades_menu:minimize(player)
 
+		elseif event.element.name == "tro_group_trades_button" then
+			player_global.trades_menu.filter.group_by_city = not player_global.trades_menu.filter.group_by_city
+			player_global.trades_menu:refresh_trades_list(player)
+
+		elseif event.element.name == "tro_allow_trades_button" then
+			player_global.trades_menu.filter.traders = not player_global.trades_menu.filter.traders
+			player_global.trades_menu:refresh_trades_list(player)
+
+		elseif event.element.name == "tro_allow_malls_button" then
+			player_global.trades_menu.filter.malls = not player_global.trades_menu.filter.malls
+			player_global.trades_menu:refresh_trades_list(player)
+
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
 			local tag = event.element.tags
 			local search = {}
 			if event.button == 4 then -- right mouse button
+				player_global.trades_menu.filter.ingredients = true
+				player_global.trades_menu.filter.products = false
 				search = Search:new("ingredient", tag.item_name, tag.type)
 			elseif event.button == 2 then -- left mouse button
+				player_global.trades_menu.filter.products = true
+				player_global.trades_menu.filter.ingredients = false
 				search = Search:new("product", tag.item_name)
 			end
-			player_global.trades_menu:update_search(player, search, true, true)
+			player_global.trades_menu:update_trades_list(player, search, true, true)
 		elseif event.element.name == "tro_move_back_in_search_history_button" then
 			player_global.trades_menu:move_backward_in_search_history(player)
 		end
@@ -449,7 +465,7 @@ script.on_event(defines.events.on_gui_text_changed,
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		local new_search = event.element.text
-		player_global.trades_menu:update_search(player, convert_search_text_to_search_object(new_search), false)
+		player_global.trades_menu:update_trades_list(player, convert_search_text_to_search_object(new_search), false, false)
 	end
 )
 
