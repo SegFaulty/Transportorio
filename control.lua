@@ -1,4 +1,5 @@
 Search = require("data.Search")
+Search_history = require("data.Search_history")
 Trade_menu = require("scripts.gui")
 City = require("scripts.city_generation")
 
@@ -482,5 +483,16 @@ script.on_event("tro_toggle_trade_menu",
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		player_global.trades_menu:toggle(player)
+	end
+)
+
+script.on_load(
+	function()
+		-- re-setup metatables
+		local player_trades_menu = global.players[1].trades_menu
+		Trade_menu:reset_metatable(player_trades_menu)
+		local player_search_history = player_trades_menu.search_history
+		Search_history:reset_metatable(player_search_history)
+
 	end
 )
