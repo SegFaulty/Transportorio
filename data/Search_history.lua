@@ -9,6 +9,12 @@ function Search_history:new()
 	return search
 end
 
+-- re-sets the metatable of an instance
+function Search_history:reset_metatable(search_history_instance)
+	setmetatable(search_history_instance, self)
+	self.__index = self
+end
+
 function Search_history:add_search(search)
 	local history_length = #self
 

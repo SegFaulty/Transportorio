@@ -29,6 +29,12 @@ function Trades_menu:new()
 	return trades_menu
 end
 
+-- re-sets the metatable of an instance
+function Trades_menu:reset_metatable(trades_menu_instance)
+	setmetatable(trades_menu_instance, self)
+	self.__index = self
+end
+
 -- opens players trade menu if closed; closes players trade menu if open
 function Trades_menu:toggle(player)
 	if self.active == false then
