@@ -8,7 +8,7 @@ local City = {
 	}
 }
 
-function City:new(surface, chunk)
+function City:new()
 	local city = {	
 		center = nil, -- center location of the city
 		tier = nil, -- city tier
@@ -20,15 +20,6 @@ function City:new(surface, chunk)
 	}
 	setmetatable(city, self)
 	self.__index = self
-
-	-- get a random area
-	local city_center = city:get_random_location(chunk)
-
-	-- return if city too close
-	if City:check_for_nearby_cities(surface, city_center) then return nil end
-
-	city.center = city_center
-	city:spawn_city(surface, city_center)
 
 	return city
 end
@@ -117,7 +108,15 @@ function City:create_city_building(surface, entity_prototype_name, search_center
 	return new_entity
 end
 
-function City:spawn_city (surface, center)
+function City:spawn_city (surface, chunk)
+	-- get a random area
+	local center = city:get_random_location(chunk)
+
+	-- return if city too close
+	if City:check_for_nearby_cities(surface, center) then return nil end
+
+	city.center = center
+	city:spawn_city(surface, center)
 
 	-- search around the city center for obstacles and remove them
 	local area = {{center.x-20,center.y-20},{center.x+20,center.y+20}}
