@@ -88,8 +88,8 @@ script.on_event({defines.events.on_chunk_generated},
 		if math.random(1,100)>math.max(1,settings.global["probability-of-city-placement"].value) then return end
 		local city_center = event.area
 		local surface = event.surface
-		local city = City:new(surface, city_center)
-		if city ~= nil then
+		local city = City:new()
+		if city:spawn_city(surface, city_center) then
 			table.insert(global.cities, city)
 		end
 	end
