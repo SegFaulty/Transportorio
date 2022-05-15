@@ -165,12 +165,15 @@ function Trades_menu:update_trades_list(player, search, add_to_search_history, u
 	if search.filter == "products" then
 		self.filter["products"] = true
 		self.filter["ingredients"] = false
-	elseif search.filter == "products" then
+	elseif search.filter == "ingredients" then
 		self.filter["products"] = false
 		self.filter["ingredients"] = true
-	elseif search.filter == "" then
+	elseif search.filter == "" or search.filter == "any" then
 		self.filter["products"] = true
 		self.filter["ingredients"] = true
+	else
+		self.filter["products"] = false
+		self.filter["ingredients"] = false
 	end
 
 	self:create_list_rows(trades_list, global.cities, search.searched_item, player)
@@ -268,19 +271,19 @@ function Trades_menu:create_list_rows(list, cities, search_term, player)
 end
 
 -- creates a ui explaining the search for an item failed as well as next steps
-function Trades_menu:create_failed_search_message(list, player, filter, search_term)
+function Trades_menu:create_failed_search_message(list, player, search_term)
 	local search_history = self.search_history
 	local message_element = list.add{type="flow"}
 	local horizontal_flow = message_element.add{type="flow", direction="horizontal"}
 
 	-- main text
-	if filter == "any" then
+	if self.filter.products == true and self.filter.ingredients == true then
 		horizontal_flow.add{type="label", caption="No recipes found."}
-	elseif filter == "product" then
+	elseif self.filter.products == true then
 		horizontal_flow.add{type="label", caption="No recipes create"}
 		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
 		horizontal_flow.add{type="label", caption=search_term}
-	elseif filter == "ingredient" then
+	elseif self.filter.ingredients == true then
 		horizontal_flow.add{type="label", caption="No recipes require"}
 		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
 		horizontal_flow.add{type="label", caption=search_term}
