@@ -240,7 +240,9 @@ function Trades_menu:create_list_rows(list, cities, search_term, player)
 				end
 			end
 		end
-		table.insert(cities_trades, city_trades)
+		if #city_trades > 0 then
+			table.insert(cities_trades, city_trades)
+		end
 	end
 
 	-- create the list rows
