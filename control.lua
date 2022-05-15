@@ -500,3 +500,37 @@ script.on_load(
 		end
 	end
 )
+
+-- add trade menu if it didnt exist
+script.on_configuration_changed(
+	function(event)
+		global.cities = {}
+
+		-- add a trade_menu to each player without one.
+		for i, player in ipairs(global.players) do
+			if player.trades_menu == nil then
+				global.players[i] = {
+					trades_menu = Trade_menu:new()
+				}
+			end
+		end
+
+		-- add all existing cities into one big city group
+		local surface_entities = game.surfaces[1].find_entities_filtered{force="player"}
+
+		local city = City:new()
+		for i, entity in ipairs(surface_entities) do
+			if entity.name == "assembling-machine-1" 
+			or entity.name == "assembling-machine-2"
+			or entity.name == "assembling-machine-3" then
+				table.insert(city.buildings.traders, entity)
+
+			elseif entity.name == "rocket-silo"
+			or entity.name == "beacon"
+			or entity.name == "lab" then
+				table.insert(city.buildings.other, entity)
+			end
+		end
+		table.insert(global.cities, city)
+	end
+)
