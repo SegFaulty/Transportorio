@@ -439,11 +439,11 @@ script.on_event(defines.events.on_gui_click,
 			if event.button == 4 then -- right mouse button
 				player_global.trades_menu.filter.ingredients = true
 				player_global.trades_menu.filter.products = false
-				search = Search:new("ingredient", tag.item_name, tag.type)
+				search = Search:new("ingredients", tag.item_name, tag.type)
 			elseif event.button == 2 then -- left mouse button
 				player_global.trades_menu.filter.products = true
 				player_global.trades_menu.filter.ingredients = false
-				search = Search:new("product", tag.item_name)
+				search = Search:new("products", tag.item_name)
 			end
 			player_global.trades_menu:update_trades_list(player, search, true, true)
 		elseif event.element.name == "tro_move_back_in_search_history_button" then
