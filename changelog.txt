@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.0.9
+Date: 2022-05-15
+  Info:
+    - updated changelog to follow factorio guidelines
+
+  Bugfixes:
+    - possible crash when generating a new city with a rocket-silo
+    - crash when updating to 0.0.8 or higher with a world created on 0.0.6 or older
+    - game should properly migrate save file data to newer versions
+    - trade menu filter not updating trade list properly
+    - failed search message not showing up
+
+---------------------------------------------------------------------------------------------------
 Version: 0.0.8
 Date: 2022-05-14
 
