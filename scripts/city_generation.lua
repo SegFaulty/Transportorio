@@ -113,7 +113,7 @@ function City:spawn_city (surface, chunk)
 	local center = self:get_random_location(chunk)
 
 	-- return if city too close
-	if self:check_for_nearby_cities(surface, center) then return nil end
+	if self:check_for_nearby_cities(surface, center) then return false end
 
 	self.center = center
 
@@ -471,6 +471,7 @@ function City:spawn_city (surface, chunk)
 	paved[i]={name = tiles[math.max(city_tier,city_tier2)], position = v} 
 	end
 	game.surfaces[1].set_tiles(paved)
+	return true
 end
 
 return City
