@@ -160,6 +160,19 @@ function Trades_menu:update_trades_list(player, search, add_to_search_history, u
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
+
+	-- update GUI filter
+	if search.filter == "products" then
+		self.filter["products"] = true
+		self.filter["ingredients"] = false
+	elseif search.filter == "products" then
+		self.filter["products"] = false
+		self.filter["ingredients"] = true
+	elseif search.filter == "" then
+		self.filter["products"] = true
+		self.filter["ingredients"] = true
+	end
+
 	self:create_list_rows(trades_list, global.cities, search.searched_item, player)
 end
 
