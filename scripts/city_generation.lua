@@ -110,13 +110,12 @@ end
 
 function City:spawn_city (surface, chunk)
 	-- get a random area
-	local center = city:get_random_location(chunk)
+	local center = self:get_random_location(chunk)
 
 	-- return if city too close
-	if City:check_for_nearby_cities(surface, center) then return nil end
+	if self:check_for_nearby_cities(surface, center) then return nil end
 
-	city.center = center
-	city:spawn_city(surface, center)
+	self.center = center
 
 	-- search around the city center for obstacles and remove them
 	local area = {{center.x-20,center.y-20},{center.x+20,center.y+20}}
