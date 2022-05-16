@@ -52,32 +52,8 @@ function Trades_menu:open(player)
 	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical"}
 
 	self:create_title_bar(root_frame)
-
-	filter_flow = root_frame.add{type="flow", direction="horizontal", name="tro_filter_bar"}
-	filter_flow.add{type="textfield", name="tro_trade_menu_search", tooltip = {"tro.trade_menu_textfield"}}
-	filter_flow.add{
-		type="button",
-		caption="back",
-		name="tro_move_back_in_search_history_button",
-		tooltip = {"tro.trade_menu_back_but"}
-	}	filter_flow.add{
-		type="button",
-		caption="group",
-		name="tro_group_trades_button",
-		tooltip = {"tro.group_trades_button"},
-		style="tro_trade_group_button",
-	}	filter_flow.add{
-		type="button",
-		caption="trades",
-		name="tro_allow_trades_button",
-		tooltip = {"tro.allow_trades_button"},
-
-	}	filter_flow.add{
-		type="button",
-		caption="malls",
-		name="tro_allow_malls_button",
-		tooltip = {"tro.allow_malls_button"}
-	}
+	self:create_filter_options(root_frame)
+	
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
 
 	if #self.search_history >= 1 then
@@ -119,6 +95,34 @@ function Trades_menu:destroy(player)
 
 	-- update players state
 	self.active = not self.active
+end
+
+function Trades_menu:create_filter_options(root)
+	filter_flow = root.add{type="flow", direction="horizontal", name="tro_filter_bar"}
+	filter_flow.add{type="textfield", name="tro_trade_menu_search", tooltip = {"tro.trade_menu_textfield"}}
+	filter_flow.add{
+		type="button",
+		caption="back",
+		name="tro_move_back_in_search_history_button",
+		tooltip = {"tro.trade_menu_back_but"}
+	}	filter_flow.add{
+		type="button",
+		caption="group",
+		name="tro_group_trades_button",
+		tooltip = {"tro.group_trades_button"},
+		style="tro_trade_group_button",
+	}	filter_flow.add{
+		type="button",
+		caption="trades",
+		name="tro_allow_trades_button",
+		tooltip = {"tro.allow_trades_button"},
+
+	}	filter_flow.add{
+		type="button",
+		caption="malls",
+		name="tro_allow_malls_button",
+		tooltip = {"tro.allow_malls_button"}
+	}
 end
 
 function Trades_menu:create_page_index(frame, amount)
