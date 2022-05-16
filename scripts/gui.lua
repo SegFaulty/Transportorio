@@ -89,6 +89,8 @@ function Trades_menu:open(player)
 		self:create_list_rows(trades_list, global.cities, "", player)
 	end
 	
+	self:create_page_index(root_frame, 10)
+	
 	root_frame.style.size = {800, 700}
 	root_frame.auto_center = true
 	self.active = not self.active
@@ -117,6 +119,19 @@ function Trades_menu:destroy(player)
 
 	-- update players state
 	self.active = not self.active
+end
+
+function Trades_menu:create_page_index(frame, amount)
+	local root = frame.add{type="frame", direction="horizontal", style="tro_page_index_root"}
+	root.add{type="button", caption="<<", style="tro_page_index_button"}
+	root.add{type="button", caption="<", style="tro_page_index_button"}
+	local page_buttons = root.add{type="flow", style="tro_page_index_button_flow"}
+	root.add{type="button", caption=">", style="tro_page_index_button"}
+	root.add{type="button", caption=">>", style="tro_page_index_button"}
+
+	for i=1, amount do
+		page_buttons.add{type="button", caption=i, style="tro_page_index_button"}
+	end
 end
 
 -- updates the GUI search box
