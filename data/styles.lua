@@ -41,3 +41,8 @@ styles["tro_page_index_button"] = {
     type = "button_style",
     minimal_width = 0,
 }
+
+styles["tro_trades_gui"] = {
+    type = "frame_style",
+    size = {800, 700},
+}
