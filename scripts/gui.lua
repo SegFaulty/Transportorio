@@ -36,40 +36,70 @@ function Trades_menu:reset_metatable(trades_menu_instance)
 end
 
 -- opens players trade menu if closed; closes players trade menu if open
-function Trades_menu:toggle(player)
+function Trades_menu:toggle(player, assemblers)
 	if self.active == false then
-		self:open(player)
+		self:open(player, global.cities)
 	else
 		self:close(player)
 	end
 end
 
-function Trades_menu:open(player)
+function Trades_menu:filter_cities(cities, search)
+	local filtered_cities = {}
+
+	-- filter the cities trades
+	for i, city in ipairs(cities) do
+		-- get trades for each city
+		local city_trades = get_city_trades(city, self.filter.traders, self.filter.malls, false)
+
+		-- if the menu was minimized instead of closed, filter trades by last search
+		if search ~= nil then
+			city_trades = filter_assemblers_by_recipe(city_trades, search, self.filter.ingredients, self.filter.products)
+		elseif #self.search_history >= 1 then
+			local last_search = self.search_history[1].searched_item
+			city_trades = filter_assemblers_by_recipe(city_trades, last_search, self.filter.ingredients, self.filter.products)
+		end
+
+		if #city_trades == 0 then goto next_loop end
+
+		-- insert trades by group or individual
+		if self.filter.group_by_city then
+			table.insert(filtered_cities, city_trades)
+		else
+			for x, trade in ipairs(city_trades) do
+				table.insert(filtered_cities, trade)
+			end
+		end
+		::next_loop::
+	end
+
+	return filtered_cities
+end
+
+-- open the trades menu
+function Trades_menu:open(player, cities)
+	player.set_shortcut_toggled("trades", true)
+	local filtered_cities = self:filter_cities(cities)
+	self:create(player, filtered_cities)
+	if #self.search_history >= 1 then 
+		search = self.search_history[1]
+		self:update_search_text(player, search.searched_item, search.filter) 
+	end
+	self.active = true
+end
+
+-- creates the entire trades_menu GUI
+function Trades_menu:create(player, assemblers)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
-
-	player.set_shortcut_toggled("trades", not self.active)
-	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical"}
+	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical", style="tro_trades_gui"}
 
 	self:create_title_bar(root_frame)
 	self:create_filter_options(root_frame)
-	
-	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
-
-	if #self.search_history >= 1 then
-		local search_term = self.search_history[1].searched_item
-		local filter = self.search_history[1].filter
-		self:create_list_rows(trades_list, global.cities, search_term, filter, player)
-	else
-		-- search for all
-		self:create_list_rows(trades_list, global.cities, "", player)
-	end
-	
-	self:create_page_index(root_frame, 10)
-	
-	root_frame.style.size = {800, 700}
+	local list_element = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
+	self:fill_trades_list(list_element, assemblers)
+	self:create_pagination(root_frame, 10)
 	root_frame.auto_center = true
-	self.active = not self.active
 end
 
 -- closes gui and resets search history
@@ -125,7 +155,7 @@ function Trades_menu:create_filter_options(root)
 	}
 end
 
-function Trades_menu:create_page_index(frame, amount)
+function Trades_menu:create_pagination(frame, amount)
 	local root = frame.add{type="frame", direction="horizontal", style="tro_page_index_root"}
 	root.add{type="button", caption="<<", style="tro_page_index_button"}
 	root.add{type="button", caption="<", style="tro_page_index_button"}
@@ -160,6 +190,49 @@ function Trades_menu:refresh_trades_list(player)
 	self:update_trades_list(player, current_search, false, false)
 end
 
+-- return each assembler that has the item in its recipe ingredients and / or products
+function filter_assemblers_by_recipe(assemblers, item_name, search_ingredients, search_products)
+	search_ingredients = (search_ingredients ~= false)
+	search_products = (search_products ~= false)
+
+	local filtered_assemblers = {}
+	
+	for i, assembler in ipairs(assemblers) do
+		local recipe = assembler.get_recipe()
+		if recipe_contains(recipe, item_name, search_ingredients, search_products) then
+			table.insert(filtered_assemblers, assembler)
+		end
+	end
+
+	return filtered_assemblers
+end
+
+-- check if a recipe has an item in ingredients and / or products   
+function recipe_contains(recipe, item_name, search_ingredients, search_products)
+	search_ingredients = (search_ingredients ~= false)
+	search_products = (search_products ~= false)
+
+	-- check if the recipe has the item as a product
+	if search_products == false then goto ingredient end -- skip product search
+	for i, product in ipairs(recipe.products) do
+		if string.find(product.name, item_name, 0, true) then
+			return true
+		end
+	end
+
+	::ingredient::
+	-- check if the recipe has the item as an ingredient
+	if search_ingredients == false then goto finish end -- skip ingredient search
+	for i, ingredient in ipairs(recipe.ingredients) do
+		if string.find(ingredient.name, item_name, 0, true) then
+			return true
+		end
+	end
+
+	::finish::
+	return false
+end
+
 -- updates the trade menu window search bar and search list based on search text
 function Trades_menu:update_trades_list(player, search, add_to_search_history, update_search_field)
 	update_search_field = update_search_field or false
@@ -169,33 +242,42 @@ function Trades_menu:update_trades_list(player, search, add_to_search_history, u
 		return
 	end
 
+	-- update search history
 	if add_to_search_history then
 		self.search_history:add_search(search)
 	end
 
+	-- update search field
 	if update_search_field then
 		self:update_search_text(player, search.searched_item, search.filter)
 	end
+
+	-- update GUI filter
+	if search.filter == "products" then
+		self.filter.products = true
+		self.filter.ingredients = false
+	elseif search.filter == "ingredients" then
+		self.filter.products = false
+		self.filter.ingredients = true
+	elseif search.filter == "" or search.filter == "any" then
+		self.filter.products = true
+		self.filter.ingredients = true
+	else
+		self.filter.products = false
+		self.filter.ingredients = false
+	end
+
 	-- update trades list
 	local trades_list = player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]
 	trades_list.clear()
 
-	-- update GUI filter
-	if search.filter == "products" then
-		self.filter["products"] = true
-		self.filter["ingredients"] = false
-	elseif search.filter == "ingredients" then
-		self.filter["products"] = false
-		self.filter["ingredients"] = true
-	elseif search.filter == "" or search.filter == "any" then
-		self.filter["products"] = true
-		self.filter["ingredients"] = true
+	player.set_shortcut_toggled("trades", true)
+	local filtered_cities = self:filter_cities(global.cities, search.searched_item)
+	if(#filtered_cities == 0) then
+		self:create_failed_search_message(trades_list, player, search.searched_item)
 	else
-		self.filter["products"] = false
-		self.filter["ingredients"] = false
+		self:fill_trades_list(trades_list, filtered_cities)
 	end
-
-	self:create_list_rows(trades_list, global.cities, search.searched_item, player)
 end
 
 function Trades_menu:create_title_bar(root_element)
@@ -215,77 +297,51 @@ function Trades_menu:create_title_bar(root_element)
 	}
 end
 
--- check an assemblers current recipe for an item. The filter decides whether to check the ingredients, products, or both.
-function Trades_menu:check_assembler_recipe_for_item(assembler, item_name, filter)
-	local recipe = assembler.get_recipe()
-	-- check if the recipe has the item as a product
-	if self.filter.products == false then goto ingredient end -- skip product search
-	for i, product in ipairs(recipe.products) do
-		if string.find(product.name, item_name, 0, true) then
-			return true
-		end
+function get_city_trades(city, allow_traders, allow_malls, allow_other)
+	allow_traders = (allow_traders ~= false)
+	allow_malls = (allow_malls ~= false)
+	allow_other = (allow_other ~= false)
+
+	local city_trades = {}
+
+	-- retrieve each citys trader trades
+	if allow_traders == false then goto malls end
+	for x, building in ipairs(city.buildings.traders) do
+		table.insert(city_trades, building)
 	end
 
-	::ingredient::
-	-- check if the recipe has the item as an ingredient
-	if self.filter.ingredients == false then goto finish end -- skip ingredient search
-	for i, ingredient in ipairs(recipe.ingredients) do
-		if string.find(ingredient.name, item_name, 0, true) then
-			return true
-		end
+	::malls::
+	-- retrieve each citys mall trades
+	if allow_malls == false then goto finish end
+	for x, building in ipairs(city.buildings.malls) do
+		table.insert(city_trades, building)
 	end
 
 	::finish::
-	return false
+	return city_trades
+
 end
 
--- creates each trade row from the list of machines and a filter. then adds the rows onto the list
-function Trades_menu:create_list_rows(list, cities, search_term, player)
-
-	local cities_trades = {}
-
-	-- filter which city trades are allowed
-	for i, city in ipairs(cities) do
-		local city_trades = {}
-		if self.filter.traders then
-			for x, building in ipairs(city.buildings.traders) do
-				if self:check_assembler_recipe_for_item(building, search_term, self.filter) then
-					table.insert(city_trades, building)
-				end
-			end
-		end
-
-		if self.filter.malls then
-			for x, building in ipairs(city.buildings.malls) do
-				if self:check_assembler_recipe_for_item(building, search_term, self.filter) then
-					table.insert(city_trades, building)
-				end
-			end
-		end
-		if #city_trades > 0 then
-			table.insert(cities_trades, city_trades)
-		end
+function Trades_menu:fill_trades_list(list_element, assemblers)
+	if self.filter.group_by_city then
+		self:fill_trades_list_with_groups(list_element, assemblers)
+	else
+		self:fill_trades_list_without_groups(list_element, assemblers)
 	end
+end
 
-	-- create the list rows
-	if #cities_trades > 0 then
-		-- create a row for each recipe for each assembler
-		for i, city_trades in ipairs(cities_trades) do
-			if self.filter.group_by_city and #city_trades > 0 then
-				grouped_list = list.add{type="frame", direction="vertical", style="inner_frame_in_outer_frame"}
-				for x, trade in ipairs(city_trades) do
-					self:create_row(grouped_list, trade)
-				end
-				table.insert(list, grouped_list)
-			elseif self.filter.group_by_city == false then
-				for x, trade in ipairs(city_trades) do
-					self:create_row(list, trade)
-				end
-			end
-		end
-	else 
-		-- if list is empty, create a message saying as much
-		local message_element = self:create_failed_search_message(list, player, search_term)
+-- fills an element with groups of rows
+function Trades_menu:fill_trades_list_with_groups(element, assembler_groups)
+	for i, assemblers in ipairs(assembler_groups) do
+		local group_element	= element.add{type="frame", direction="vertical", style="inner_frame_in_outer_frame"}
+		self:fill_trades_list_without_groups(group_element, assemblers)
+	end
+end
+
+-- fills an element with rows
+function Trades_menu:fill_trades_list_without_groups(element, assemblers)
+	for i, assembler in ipairs(assemblers) do
+		self:create_trade_row(element, assembler)
 	end
 end
 
@@ -318,17 +374,18 @@ function Trades_menu:create_failed_search_message(list, player, search_term)
 	end
 end
 
-function Trades_menu:create_row(list, assembler)
+-- create the ui for a trade row
+function Trades_menu:create_trade_row(element, assembler)
 	-- disassemble assembler into usable parts
 	local recipe = assembler.get_recipe()
 	local position = assembler.position
 	local ingredients = recipe.ingredients
 	local products = recipe.products
 
-	local trade_row = list.add{type="frame", style="tro_trade_row"}
+	local root = element.add{type="frame", style="tro_trade_row"}
+	local trade_row_flow = root.add{type="flow", style="tro_trade_row_flow"} -- needed for vertical align (wont work on root frame)
 
 	-- create row buttons
-	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
 	trade_row_flow.add{
 		type="button",
 		caption="ping",
@@ -336,47 +393,45 @@ function Trades_menu:create_row(list, assembler)
 		tags={location=position}, 
 		tooltip={"tro.trade_menu_ping"}
 	}
-	trade_row_flow.add{type="button",
+	trade_row_flow.add{
+		type="button",
 		caption="goto",
 		name="tro_goto_button",
 		tags={location=position},
 		tooltip={"tro.trade_menu_goto"}
 	}
 	
-	-- create sprite buttons and labels for each ingredient and product
-	if #ingredients >= 1 then
-		for i, ingredient in ipairs(ingredients) do
-			trade_row_flow.add{
-				type="sprite-button",
-				sprite = ingredient.type .. "/" .. ingredient.name, 
-				tags={
-					action="tro_filter_list",
-					item_name=ingredient.name,
-					filter="ingredient",
-					type=ingredient.type
-				},
-				tooltip={"", {"tro.item_name"}, ": ", ingredient.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
-			}
-			trade_row_flow.add{type="label", caption = ingredient.amount}
-		end
+	-- create sprite buttons and labels for each ingredient 
+	if #ingredients == 0 then goto products end-- recipes can have no ingredient (free items)
+	for i, ingredient in ipairs(ingredients) do
+		self:create_trade_row_item(trade_row_flow, ingredient, "ingredient")
 	end
 
+	-- create divider between ingredients and products
 	trade_row_flow.add{type="label", caption = " --->"}
 
+	::products::
+	-- create sprite buttons and labels for each product
 	for i, product in ipairs(products) do
-		trade_row_flow.add{
-			type="sprite-button",
-			sprite = product.type .. "/" .. product.name, 
-			tags={
-				action="tro_filter_list",
-				item_name=product.name,
-				filter="product", 
-				type=product.type
-			},
-			tooltip={"", {"tro.item_name"}, ": ", product.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
-		}
-		trade_row_flow.add{type="label", caption = product.amount}
+		self:create_trade_row_item(trade_row_flow, product, "product")
 	end
+end
+
+-- create a custom set of elements for the trade row
+function Trades_menu:create_trade_row_item(element, item, type)
+	element.add{
+		type = "sprite-button",
+		sprite = item.type .. "/" .. item.name, 
+		tags = {
+			action = "tro_filter_list",
+			item_name = item.name,
+			filter = type, 
+			type = item.type
+		},
+		tooltip = {"", {"tro.item_name"}, ": ", item.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
+	}
+	-- item amount
+	element.add{type = "label", caption = item.amount}
 end
 
 function Trades_menu:move_backward_in_search_history(player)
