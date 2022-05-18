@@ -8,7 +8,8 @@ local Trades_menu = {
 		malls=true,
 		ingredients=true,
 		products=true
-	}
+	},
+	pagination_pages = {}
 }
 
 function Trades_menu:new()
@@ -80,7 +81,15 @@ end
 function Trades_menu:open(player, cities)
 	player.set_shortcut_toggled("trades", true)
 	local filtered_cities = self:filter_cities(cities)
+	local max_trades = settings.get_player_settings(player)["max-trades-per-page"].value
+	if self.filter.group_by_city then
+		self:create_pagination_pages_by_city(max_trades, filtered_cities)
+	else
+		self:create_pagination_pages_by_assembler(max_trades, filtered_cities)
+	end
+
 	self:create(player, filtered_cities)
+
 	if #self.search_history >= 1 then 
 		search = self.search_history[1]
 		self:update_search_text(player, search.searched_item, search.filter) 
@@ -445,6 +454,46 @@ function Trades_menu:move_backward_in_search_history(player)
 	end
 
 	self:update_trades_list(player, new_search, false, true)
+end
+
+---Fills a page up to the max_trades amount with trades while keeping the trades in their original group.
+---If a page cannot hold the entire group a new page is created and the old one stored.
+---Continues to create fill pages until there are no more groups left.
+---@param max_trades number the maximum amount of trades on each page.
+---@param cities table[]
+function Trades_menu:create_pagination_pages_by_city(max_trades, cities)
+	local trades_in_page = 0
+	page = {}
+	for i, city in ipairs(cities) do
+		if (trades_in_page + #city) <= max_trades then -- adding city would stay within page limit
+			table.insert(page, city)
+			trades_in_page = trades_in_page + #city
+		else -- adding city would exceed page limit
+			table.insert(self.pagination_pages, page)
+			page = {}
+			trades_in_page = 0
+			table.insert(page, city)
+			trades_in_page = trades_in_page + #city
+		end
+	end
+end
+
+---Fills a page up to the max_trades amount with assemblers.
+---When a page is full it gets stored in memory and a new one is created.
+---Continues to create fill pages until there are no more assemblers left.
+---@param max_trades number the maximum amount of trades on each page.
+---@param assemblers table[]
+function Trades_menu:create_pagination_pages_by_assembler(max_trades, assemblers)
+	local max_trades
+	local page = {}
+	
+	for i, assembler in ipairs(assemblers) do
+		table.insert(page, assembler)
+		if i % max_trades == 0 then -- if max trades = 100 and 100/100 has 0 remainder or 200/100 has 0 remainder (etc) then page is full
+			table.insert(self.pagination_pages, page)
+			page = {}
+		end
+	end
 end
 
 return Trades_menu
