@@ -1,3 +1,10 @@
+---@class City
+---@field center MapPosition
+---@field tier number
+---@field buildings table
+---@field buildings.traders table
+---@field buildings.malls table
+---@field buildings.other table
 local City = {
 	center = nil, -- center location of the city
 	tier = nil, -- city tier
@@ -8,6 +15,8 @@ local City = {
 	}
 }
 
+---create a new City object
+---@return table city
 function City:new()
 	local city = {	
 		center = nil, -- center location of the city
@@ -24,7 +33,10 @@ function City:new()
 	return city
 end
 
--- check surroundings for another city
+---check surroundings for another city
+---@param surface LuaSurface
+---@param center MapPosition
+---@return boolean
 function City:check_for_nearby_cities(surface, center)
 	traders = surface.find_entities_filtered{
 		position = center,
@@ -39,7 +51,9 @@ function City:check_for_nearby_cities(surface, center)
 	end
 end
 
--- returns a random location in an area
+---returns a random location in an area
+---@param area MapPosition
+---@return MapPosition center
 function City:get_random_location(area)
 	local center = {}
 	center.x = area.right_bottom.x - math.random(0,31)
@@ -47,7 +61,11 @@ function City:get_random_location(area)
 	return center
 end
 
--- creates any building that doesnt have specific attributes
+---creates any building that doesnt have specific attributes
+---@param surface LuaSurface
+---@param name string
+---@param position MapPosition
+---@return LuaEntity new_entity
 function City:create_normal(surface, name, position)
 	local new_entity = surface.create_entity{
 		name = name, 
@@ -62,6 +80,12 @@ function City:create_normal(surface, name, position)
 	return new_entity
 end
 
+---Creates an assembler entity
+---@param surface LuaSurface which map the entity is created on
+---@param name string entity prototype name to create
+---@param position MapPosiion where the entity is placed on the map
+---@param recipe LuaRecipe the assemblers recipe
+---@return LuaEntity new_entity
 function City:create_assembler(surface, name, position, recipe)
 	local new_entity = surface.create_entity{
 		name = name, 
@@ -78,10 +102,17 @@ function City:create_assembler(surface, name, position, recipe)
 
 	return new_entity
 end
--- specific_attributes: see luaSurface create_entity.
+
+---creates a LuaEntity where there is room and saves its position to for pavement
+---@param surface LuaSurface
+---@param entity_prototype_name string
+---@param search_center MapPosiion
+---@param pavement_size table
+---@param specific_attributes table contains any data specific to the prototype of the entity
+---@return LuaEntity|nil
 function City:create_city_building(surface, entity_prototype_name, search_center, pavement_size, specific_attributes)
 
-	-- find area mall can be spawned
+	-- find area entity can be spawned
 	local available_spawn_location = surface.find_non_colliding_position(entity_prototype_name, search_center, 30, 4, true)
 	
 	-- return if there are no suitable spawn locations
@@ -108,6 +139,10 @@ function City:create_city_building(surface, entity_prototype_name, search_center
 	return new_entity
 end
 
+---creates a new city
+---@param surface LuaSurface
+---@param chunk BoundingBox area where the city center will be. The city can still go beyond it.
+---@return boolean #was the city created successfully?
 function City:spawn_city (surface, chunk)
 	-- get a random area
 	local center = self:get_random_location(chunk)

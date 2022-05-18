@@ -1,5 +1,13 @@
 Search_history = require("data.Search_history")
 
+---@class Trades_menu
+---@field active boolean
+---@field search_history Search_history
+---@field filter table
+---@field filter.traders boolean
+---@field filter.malls boolean
+---@field filter.ingredients boolean
+---@field filter.products boolean
 local Trades_menu = {
 	active = false,
 	search_history = Search_history:new(),
@@ -11,6 +19,8 @@ local Trades_menu = {
 	}
 }
 
+---Creates a new instance of the Trades_menu class.
+---@return table trades_menu instance of Trades_menu.
 function Trades_menu:new()
 	local trades_menu = {
 		active = false,
@@ -29,13 +39,15 @@ function Trades_menu:new()
 	return trades_menu
 end
 
--- re-sets the metatable of an instance
-function Trades_menu:reset_metatable(trades_menu_instance)
-	setmetatable(trades_menu_instance, self)
+---re-sets the metatable of an instance.
+---@param instance Trades_menu
+function Trades_menu:reset_metatable(instance)
+	setmetatable(instance, self)
 	self.__index = self
 end
 
--- opens players trade menu if closed; closes players trade menu if open
+---opens players trade menu if closed; closes players trade menu if open
+---@param player LuaPlayer
 function Trades_menu:toggle(player)
 	if self.active == false then
 		self:open(player)
@@ -44,6 +56,8 @@ function Trades_menu:toggle(player)
 	end
 end
 
+---creates the trades menu GUI.
+---@param player LuaPlayer
 function Trades_menu:open(player)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
@@ -82,8 +96,7 @@ function Trades_menu:open(player)
 
 	if #self.search_history >= 1 then
 		local search_term = self.search_history[1].searched_item
-		local filter = self.search_history[1].filter
-		self:create_list_rows(trades_list, global.cities, search_term, filter, player)
+		self:create_list_rows(trades_list, global.cities, search_term, player)
 	else
 		-- search for all
 		self:create_list_rows(trades_list, global.cities, "", player)
@@ -94,20 +107,23 @@ function Trades_menu:open(player)
 	self.active = not self.active
 end
 
--- closes gui and resets search history
+---closes gui and resets search history
+---@param player LuaPlayer
 function Trades_menu:close(player)
 	player.set_shortcut_toggled("trades", not self.active)
 	self:destroy(player)
 	self.search_history:reset()
 end
 
--- closes gui without reseting search history
+---closes gui without reseting search history
+---@param player LuaPlayer
 function Trades_menu:minimize(player)
 	player.set_shortcut_toggled("trades", not self.active)
 	self:destroy(player)
 end
 
--- destroys the root gui element and all its child elements
+---destroys the root gui element and all its child elements
+---@param player LuaPlayer
 function Trades_menu:destroy(player)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
@@ -119,7 +135,10 @@ function Trades_menu:destroy(player)
 	self.active = not self.active
 end
 
--- updates the GUI search box
+---updates the GUI search box
+---@param player LuaPlayer
+---@param search string
+---@param filter string
 function Trades_menu:update_search_text(player, search, filter)
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
 	local text = filter .. ":" .. search
@@ -133,7 +152,8 @@ function Trades_menu:update_search_text(player, search, filter)
 	textfield.text = text
 end
 
--- recreate the trades list
+---recreate the trades list with updated filters
+---@param player LuaPlayer
 function Trades_menu:refresh_trades_list(player)
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
 	local current_search = convert_search_text_to_search_object(textfield.text)
@@ -141,7 +161,11 @@ function Trades_menu:refresh_trades_list(player)
 	self:update_trades_list(player, current_search, false, false)
 end
 
--- updates the trade menu window search bar and search list based on search text
+---updates the trade menu window search bar and search list based on search text
+---@param player LuaPlayer
+---@param search Search
+---@param add_to_search_history boolean
+---@param update_search_field boolean
 function Trades_menu:update_trades_list(player, search, add_to_search_history, update_search_field)
 	update_search_field = update_search_field or false
 
@@ -196,8 +220,11 @@ function Trades_menu:create_title_bar(root_element)
 	}
 end
 
--- check an assemblers current recipe for an item. The filter decides whether to check the ingredients, products, or both.
-function Trades_menu:check_assembler_recipe_for_item(assembler, item_name, filter)
+---check an assemblers current recipe for an item. The filter decides whether to check the ingredients, products, or both.
+---@param assembler LuaEntity
+---@param item_name string
+---@return boolean
+function Trades_menu:check_assembler_recipe_for_item(assembler, item_name)
 	local recipe = assembler.get_recipe()
 	-- check if the recipe has the item as a product
 	if self.filter.products == false then goto ingredient end -- skip product search
@@ -220,7 +247,11 @@ function Trades_menu:check_assembler_recipe_for_item(assembler, item_name, filte
 	return false
 end
 
--- creates each trade row from the list of machines and a filter. then adds the rows onto the list
+---creates each trade row from the list of machines and a filter. then adds the rows onto the list
+---@param list LuaGuiElement
+---@param cities table[] array of city objects
+---@param search_term string
+---@param player LuaPlayer
 function Trades_menu:create_list_rows(list, cities, search_term, player)
 
 	local cities_trades = {}
@@ -270,8 +301,10 @@ function Trades_menu:create_list_rows(list, cities, search_term, player)
 	end
 end
 
--- creates a ui explaining the search for an item failed as well as next steps
-function Trades_menu:create_failed_search_message(list, player, search_term)
+---creates a ui explaining the search for an item failed as well as next steps
+---@param list LuaGuiElement
+---@param search_term string
+function Trades_menu:create_failed_search_message(list, search_term)
 	local search_history = self.search_history
 	local message_element = list.add{type="flow"}
 	local horizontal_flow = message_element.add{type="flow", direction="horizontal"}
@@ -360,6 +393,8 @@ function Trades_menu:create_row(list, assembler)
 	end
 end
 
+---moves backward in the search history by 1 by removing the last added term
+---@param player LuaPlayer
 function Trades_menu:move_backward_in_search_history(player)
 	self.search_history:remove_last_added_term()
 

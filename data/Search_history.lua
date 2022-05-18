@@ -1,6 +1,8 @@
+---@class Search_history
 local Search_history = {}
 
--- create a new search_history object
+---create a new search_history object
+---@return table
 function Search_history:new()
 	local search = {}
 	setmetatable(search, self)
@@ -9,12 +11,15 @@ function Search_history:new()
 	return search
 end
 
--- re-sets the metatable of an instance
+---re-sets the metatable of an instance
+---@param search_history_instance Search_history
 function Search_history:reset_metatable(search_history_instance)
 	setmetatable(search_history_instance, self)
 	self.__index = self
 end
 
+---add a new search to the history
+---@param search Search
 function Search_history:add_search(search)
 	local history_length = #self
 
@@ -48,6 +53,7 @@ function Search_history:add_search(search)
 	-- game.print("search history" .. history_string)
 end
 
+---remove the last added search from itself
 function Search_history:remove_last_added_term()
 	-- if theres no history then theres nothing to do
 	if #self > 0 then
@@ -55,7 +61,7 @@ function Search_history:remove_last_added_term()
 	end
 end
 
--- deletes the search history
+---deletes the search history
 function Search_history:reset()
 	self = {}
 end
