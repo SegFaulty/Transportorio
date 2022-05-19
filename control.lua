@@ -425,7 +425,8 @@ script.on_event(defines.events.on_gui_click,
 		-- handle trades menu filter changes
 		elseif elem_tags.action == "toggle_filter" then
 			local filter = elem_tags.filter
-			player_global.trades_menu:invert_filter(player, filter)
+			player_global.trades_menu:invert_filter(filter)
+			player_global.trades_menu:refresh_trades_list(player, global.cities)
 
 		-- click on sprite buttons
 		elseif elem_tags.action == "tro_filter_list" then
@@ -447,14 +448,26 @@ script.on_event(defines.events.on_gui_click,
 		-- pagination buttons
 		elseif elem_tags.action == "switch_pagination_page" then
 			player_global.trades_menu:switch_page(player, event.element.tags.page_number)
-		elseif elem_name == "pagination_start" then
-			player_global.trades_menu:switch_page(player, 1)
-		elseif elem_name == "pagination_back" then
-			player_global.trades_menu:switch_page(player, player_global.trades_menu.current_page - 1)
-		elseif elem_name == "pagination_next" then
-			player_global.trades_menu:switch_page(player, player_global.trades_menu.current_page + 1)
-		elseif elem_name == "pagination_end" then
-			player_global.trades_menu:switch_page(player, #player_global.trades_menu.pagination_pages)
+		elseif elem_name == "pagination_first_set" then
+			player_global.trades_menu:switch_pagination_set(player, 1)
+		elseif elem_name == "pagination_previous_set" then
+			local set = player_global.trades_menu.pagination_button_set
+			if set > 1 then
+				player_global.trades_menu:switch_pagination_set(player, set - 1)
+			end
+		elseif elem_name == "pagination_next_set" then
+			local max_buttons = player_global.trades_menu.max_pagination_buttons
+			local pages = #player_global.trades_menu.pagination_pages
+			local max_sets = math.ceil(pages / max_buttons)
+			local current_set = player_global.trades_menu.pagination_button_set
+			if current_set < max_sets then
+				player_global.trades_menu:switch_pagination_set(player, current_set + 1)
+			end
+		elseif elem_name == "pagination_last_set" then
+			local max_buttons = player_global.trades_menu.max_pagination_buttons
+			local pages = #player_global.trades_menu.pagination_pages
+			local set = math.ceil(pages / max_buttons)
+			player_global.trades_menu:switch_pagination_set(player, set)
 		end
 	end
 )

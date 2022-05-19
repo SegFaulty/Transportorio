@@ -11,6 +11,8 @@ local Trades_menu = {
 	},
 	pagination_pages = {},
 	current_page = 1,
+	max_pagination_buttons = 10, -- max pagination buttons at a time
+	pagination_button_set = 1, -- which iteration of buttons ex 1-5, 6-10, etc
 }
 
 function Trades_menu:new()
@@ -38,7 +40,7 @@ function Trades_menu:reset_metatable(trades_menu_instance)
 end
 
 -- opens players trade menu if closed; closes players trade menu if open
-function Trades_menu:toggle(player, assemblers)
+function Trades_menu:toggle(player)
 	if self.active == false then
 		self:open(player, global.cities)
 	else
@@ -101,7 +103,6 @@ end
 
 -- creates the entire trades_menu GUI
 function Trades_menu:create(player)
-	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
 	local root_frame = screen_element.add{type="frame", name="tro_trade_root_frame", direction="vertical", style="tro_trades_gui"}
 
@@ -109,7 +110,11 @@ function Trades_menu:create(player)
 	self:create_filter_options(root_frame)
 	local list_element = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
 	self:fill_trades_list(list_element, self.pagination_pages[1])
-	self:create_pagination(root_frame, #self.pagination_pages)
+	if #self.pagination_pages < self.max_pagination_buttons then
+		self:create_pagination(root_frame, #self.pagination_pages)
+	else
+		self:create_pagination(root_frame, self.max_pagination_buttons)
+	end
 	root_frame.auto_center = true
 end
 
@@ -166,15 +171,21 @@ function Trades_menu:create_filter_options(root)
 end
 
 function Trades_menu:create_pagination(frame, amount)
-	local root = frame.add{type="frame", direction="horizontal", style="tro_page_index_root"}
-	root.add{type="button", caption="<<", style="tro_page_index_button", name="pagination_start"}
-	root.add{type="button", caption="<", style="tro_page_index_button", name="pagination_back"}
-	local page_buttons = root.add{type="flow", style="tro_page_index_button_flow"}
-	root.add{type="button", caption=">", style="tro_page_index_button", name="pagination_next"}
-	root.add{type="button", caption=">>", style="tro_page_index_button", name="pagination_end"}
+	local root = frame.add{type="frame", direction="horizontal", name="tro_page_index_root", style="tro_page_index_root"}
+	root.add{type="button", caption="<<", style="tro_page_index_button", name="pagination_first_set"}
+	root.add{type="button", caption="<", style="tro_page_index_button", name="pagination_previous_set"}
+	local page_buttons = root.add{type="flow", name="tro_page_index_button_flow", style="tro_page_index_button_flow"}
+	root.add{type="button", caption=">", style="tro_page_index_button", name="pagination_next_set"}
+	root.add{type="button", caption=">>", style="tro_page_index_button", name="pagination_last_set"}
 
-	for i=1, amount do
-		page_buttons.add{
+	self:create_pagination_buttons(page_buttons, amount, 1)
+	
+end
+
+
+function Trades_menu:create_pagination_buttons(pagination_buttons_element, amount, start) 
+	for i=start, amount do
+		pagination_buttons_element.add{
 			type = "button",
 			caption = i,
 			style = "tro_page_index_button",
@@ -201,11 +212,9 @@ function Trades_menu:update_search_text(player, search, filter)
 end
 
 -- recreate the trades list
-function Trades_menu:refresh_trades_list(player)
-	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
-	local current_search = convert_search_text_to_search_object(textfield.text)
-
-	self:update_trades_list(player, current_search, false, false)
+function Trades_menu:refresh_trades_list(player, cities)
+	self:destroy(player)
+	self:open(player, cities)
 end
 
 -- return each assembler that has the item in its recipe ingredients and / or products
@@ -494,7 +503,6 @@ end
 ---@param max_trades number the maximum amount of trades on each page.
 ---@param assemblers table[]
 function Trades_menu:create_pagination_pages_by_assembler(max_trades, assemblers)
-	local max_trades
 	local page = {}
 	
 	for i, assembler in ipairs(assemblers) do
@@ -519,12 +527,23 @@ function Trades_menu:switch_page(player, page)
 	end
 end
 
+function Trades_menu:switch_pagination_set(player, set)
+	self.pagination_button_set = set
+	local pagination_buttons = player.gui.screen["tro_trade_root_frame"]["tro_page_index_root"]["tro_page_index_button_flow"]
+	pagination_buttons.clear()
+	local start = 1 + (self.max_pagination_buttons * (set - 1))
+	local amount = self.max_pagination_buttons * set
+	if #self.pagination_pages < amount then
+		local remainder = amount - #self.pagination_pages
+		amount = amount - remainder
+	end
+	self:create_pagination_buttons(pagination_buttons, amount, start)
+end
+
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
----@param player LuaPlayer
 ---@param filter string
-function Trades_menu:invert_filter(player, filter)
+function Trades_menu:invert_filter(filter)
 	self.filter[filter] = not self.filter[filter]
-	self:refresh_trades_list(player)
 end
 
 return Trades_menu
