@@ -448,6 +448,16 @@ script.on_event(defines.events.on_gui_click,
 			player_global.trades_menu:update_trades_list(player, search, true, true)
 		elseif event.element.name == "tro_move_back_in_search_history_button" then
 			player_global.trades_menu:move_backward_in_search_history(player)
+		elseif event.element.tags.action == "switch_pagination_page" then
+			player_global.trades_menu:switch_page(player, event.element.tags.page_number)
+		elseif event.element.name == "pagination_start" then
+			player_global.trades_menu:switch_page(player, 1)
+		elseif event.element.name == "pagination_back" then
+			player_global.trades_menu:switch_page(player, player_global.trades_menu.current_page - 1)
+		elseif event.element.name == "pagination_next" then
+			player_global.trades_menu:switch_page(player, player_global.trades_menu.current_page + 1)
+		elseif event.element.name == "pagination_end" then
+			player_global.trades_menu:switch_page(player, #player_global.trades_menu.pagination_pages)
 		end
 	end
 )
