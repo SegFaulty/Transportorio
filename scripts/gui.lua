@@ -144,24 +144,23 @@ function Trades_menu:create_filter_options(root)
 	filter_flow.add{
 		type="button",
 		caption="back",
-		name="tro_move_back_in_search_history_button",
 		tooltip = {"tro.trade_menu_back_but"}
 	}	filter_flow.add{
 		type="button",
 		caption="group",
-		name="tro_group_trades_button",
+		tags={action="toggle_filter", filter="group_by_city"},
 		tooltip = {"tro.group_trades_button"},
 		style="tro_trade_group_button",
 	}	filter_flow.add{
 		type="button",
 		caption="trades",
-		name="tro_allow_trades_button",
+		tags={action="toggle_filter", filter="traders"},
 		tooltip = {"tro.allow_trades_button"},
 
 	}	filter_flow.add{
 		type="button",
 		caption="malls",
-		name="tro_allow_malls_button",
+		tags={action="toggle_filter", filter="malls"},
 		tooltip = {"tro.allow_malls_button"}
 	}
 end
@@ -518,6 +517,14 @@ function Trades_menu:switch_page(player, page)
 		self:fill_trades_list(trades_list, self.pagination_pages[page])
 		self.current_page = page
 	end
+end
+
+---inverts the boolean filter and refreshes the GUI to reflect the filter changes
+---@param player LuaPlayer
+---@param filter string
+function Trades_menu:invert_filter(player, filter)
+	self.filter[filter] = not self.filter[filter]
+	self:refresh_trades_list(player)
 end
 
 return Trades_menu
