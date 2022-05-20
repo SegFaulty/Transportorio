@@ -452,25 +452,13 @@ script.on_event(defines.events.on_gui_click,
 		elseif elem_tags.action == "switch_pagination_page" then
 			player_global.trades_menu_model:switch_page(event.element.tags.page_number)
 		elseif elem_name == "pagination_first_set" then
-			player_global.trades_menu:switch_pagination_set(player, 1)
+			player_global.trades_menu_model:switch_pagination_set("first")
 		elseif elem_name == "pagination_previous_set" then
-			local set = player_global.trades_menu.pagination_button_set
-			if set > 1 then
-				player_global.trades_menu:switch_pagination_set(player, set - 1)
-			end
+			player_global.trades_menu_model:switch_pagination_set("previous")
 		elseif elem_name == "pagination_next_set" then
-			local max_buttons = player_global.trades_menu.max_pagination_buttons
-			local pages = #player_global.trades_menu.pagination_pages
-			local max_sets = math.ceil(pages / max_buttons)
-			local current_set = player_global.trades_menu.pagination_button_set
-			if current_set < max_sets then
-				player_global.trades_menu:switch_pagination_set(player, current_set + 1)
-			end
+			player_global.trades_menu_model:switch_pagination_set("next")
 		elseif elem_name == "pagination_last_set" then
-			local max_buttons = player_global.trades_menu.max_pagination_buttons
-			local pages = #player_global.trades_menu.pagination_pages
-			local set = math.ceil(pages / max_buttons)
-			player_global.trades_menu:switch_pagination_set(player, set)
+			player_global.trades_menu_model:switch_pagination_set("last")
 		end
 	end
 )
