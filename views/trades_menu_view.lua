@@ -5,17 +5,15 @@ Search_history = require("data.Search_history")
 ---@field current_page number The current page being rendered inside the trades list
 ---@field max_pagination_buttons number The max amount of page buttons allowed to render at one time.
 ---@field pagination_button_set number The current set of buttons being rendered.
-local Trades_menu_view = {
-	current_page = 1,
-	max_pagination_buttons = 10,
-	pagination_button_set = 1,
-}
+local Trades_menu_view = {}
+
+----------------------------------------------------------------------
+-- public functions
 
 function Trades_menu_view:new()
 	local trades_menu_view = {
-		pagination_pages = {},
-        current_page = 1,
-        pagination_button_set = 1
+		trades_list = nil,
+		pagination_buttons = nil,
 	}
 	setmetatable(trades_menu_view, self)
 	self.__index = self
@@ -53,6 +51,31 @@ function Trades_menu_view:destroy(player)
 	-- update players state
 	self.active = not self.active
 end
+
+-- changes the GUI search box text
+function Trades_menu_view:update_search_text(player, search, filter)
+	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
+	local text = filter .. ":" .. search
+
+	if filter == nil then
+		text = search
+	else
+		text = filter .. ":" .. search
+	end
+
+	textfield.text = text
+end
+
+-- clears the old trades and adds new ones
+function Trades_menu_view:update_trades_list(assemblers)
+end
+
+-- clears the old buttons and adds new ones
+function Trades_menu_view:update_pagination_buttons(assemblers)
+end
+
+----------------------------------------------------------------------
+-- private functions
 
 function Trades_menu_view:create_title_bar(root_element)
 	local header = root_element.add{type="flow", name="tro_trade_menu_header", direction="horizontal"}
@@ -186,20 +209,6 @@ function Trades_menu_view:create_pagination_buttons(buttom_amount, set)
 			}
 		}
 	end
-end
-
--- updates the GUI search box
-function Trades_menu_view:update_search_text(player, search, filter)
-	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
-	local text = filter .. ":" .. search
-
-	if filter == nil then
-		text = search
-	else
-		text = filter .. ":" .. search
-	end
-
-	textfield.text = text
 end
 
 -- creates a ui explaining the search for an item failed as well as next steps
