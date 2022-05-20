@@ -1,0 +1,243 @@
+Trades_menu_view = require("views.trades_menu_view")
+Search_history = require("data.Search_history")
+
+local Trades_menu_model = {
+    trades_menu_view = Trades_menu_view:new(),
+    active = false,
+	search_history = Search_history:new(),
+	filter = {
+		traders=true,
+		malls=true,
+		ingredients=true,
+		products=true
+	},
+}
+
+function Trades_menu_model:new(view)
+	local trades_menu_model = {
+        trades_menu_view = view,
+        active = false,
+        search_history = Search_history:new(),
+        filter = {
+            traders=true,
+            malls=true,
+            ingredients=true,
+            products=true
+        },
+	}
+	setmetatable(trades_menu_model, self)
+	self.__index = self
+
+	return trades_menu_model
+end
+
+-- re-sets the metatable of an instance
+function Trades_menu_model:reset_metatable(trades_menu_model_instance)
+	setmetatable(trades_menu_model_instance, self)
+	self.__index = self
+end
+
+pagination = {
+    { -- page group
+        { -- page
+            assembler,
+            assembler,
+            assembler,
+        },
+        { -- page
+            assembler,
+            assembler,
+            assembler,
+        },
+
+    },
+    { -- page group
+        { -- page
+            assembler,
+            assembler,
+            assembler,
+        },
+        { -- page
+            assembler,
+            assembler,
+            assembler,
+        },
+    },
+}
+
+-- opens players trade menu if closed; closes players trade menu if open
+function Trades_menu_model:toggle(player)
+	if self.active == false then
+		self.trades_menu_view:create(player)
+	else
+		self.trades_menu_view:destroy(player)
+	end
+	self.active = not self.active
+end
+
+function Trades_menu_model:get_filtered_cities(cities, search)
+	local filtered_cities = {}
+
+	-- filter the cities trades
+	for i, city in ipairs(cities) do
+		-- get trades for each city
+		local city_trades = get_city_trades(city, self.filter.traders, self.filter.malls, false)
+
+		-- if the menu was minimized instead of closed, filter trades by last search
+		if search ~= nil then
+			city_trades = filter_assemblers_by_recipe(city_trades, search, self.filter.ingredients, self.filter.products)
+		elseif #self.search_history >= 1 then
+			local last_search = self.search_history[1].searched_item
+			city_trades = filter_assemblers_by_recipe(city_trades, last_search, self.filter.ingredients, self.filter.products)
+		end
+
+		if #city_trades == 0 then goto next_loop end
+
+		-- insert trades by group or individual
+		if self.filter.group_by_city then
+			table.insert(filtered_cities, city_trades)
+		else
+			for x, trade in ipairs(city_trades) do
+				table.insert(filtered_cities, trade)
+			end
+		end
+		::next_loop::
+	end
+
+	return filtered_cities
+end
+
+-- open the trades menu
+function Trades_menu_model:open(player, cities)
+	player.set_shortcut_toggled("trades", true)
+
+    -- get each city's assemblers
+    local cities_assemblers = {}
+    for city in ipairs(cities) do
+		table.insert(cities_assemblers, get_city_trades(city, self.filter.traders, self.filter.malls, false))
+    end
+
+    -- filter assemblers by their recipe
+    -- filter_assemblers_by_recipe(cities_assemblers)
+    -- group assemblers into pages
+    -- group pages in groups
+    -- put groups in pagination array
+    -- send data to view
+	local filtered_cities = self:filter_cities(cities)
+	local max_trades = settings.get_player_settings(player)["max-trades-per-page"].value
+	self.pagination_pages = {}
+	if self.filter.group_by_city then
+		self:create_pagination_pages_by_city(max_trades, filtered_cities)
+	else
+		self:create_pagination_pages_by_assembler(max_trades, filtered_cities)
+	end
+
+	self:create(player)
+
+	if #self.search_history >= 1 then 
+		search = self.search_history[1]
+		self:update_search_text(player, search.searched_item, search.filter) 
+	end
+	self.active = true
+end
+
+-- closes gui and resets search history
+function Trades_menu_model:close(player)
+	player.set_shortcut_toggled("trades", not self.active)
+	self:destroy(player)
+	self.search_history:reset()
+end
+
+-- closes gui without reseting search history
+function Trades_menu_model:minimize(player)
+	player.set_shortcut_toggled("trades", not self.active)
+	self:destroy(player)
+end
+
+-- return each assembler that has the item in its recipe ingredients and / or products
+function filter_assemblers_by_recipe(assemblers, item_name, search_ingredients, search_products)
+	search_ingredients = (search_ingredients ~= false)
+	search_products = (search_products ~= false)
+
+	local filtered_assemblers = {}
+	
+	for i, assembler in ipairs(assemblers) do
+		local recipe = assembler.get_recipe()
+		if recipe_contains(recipe, item_name, search_ingredients, search_products) then
+			table.insert(filtered_assemblers, assembler)
+		end
+	end
+
+	return filtered_assemblers
+end
+
+-- check if a recipe has an item in ingredients and / or products   
+function recipe_contains(recipe, item_name, search_ingredients, search_products)
+	search_ingredients = (search_ingredients ~= false)
+	search_products = (search_products ~= false)
+
+	-- check if the recipe has the item as a product
+	if search_products == false then goto ingredient end -- skip product search
+	for i, product in ipairs(recipe.products) do
+		if string.find(product.name, item_name, 0, true) then
+			return true
+		end
+	end
+
+	::ingredient::
+	-- check if the recipe has the item as an ingredient
+	if search_ingredients == false then goto finish end -- skip ingredient search
+	for i, ingredient in ipairs(recipe.ingredients) do
+		if string.find(ingredient.name, item_name, 0, true) then
+			return true
+		end
+	end
+
+	::finish::
+	return false
+end
+
+function get_city_buildings(city, allow_traders, allow_malls, allow_other)
+	allow_traders = (allow_traders ~= false)
+	allow_malls = (allow_malls ~= false)
+	allow_other = (allow_other ~= false)
+
+	local city_buildings = {}
+
+	-- retrieve each citys trader trades
+	if allow_traders == false then goto malls end
+	for building in ipairs(city.buildings.traders) do
+		table.insert(city_buildings, building)
+	end
+
+	::malls::
+	-- retrieve each citys mall trades
+	if allow_malls == false then goto finish end
+	for building in ipairs(city.buildings.malls) do
+		table.insert(city_buildings, building)
+	end
+
+	::finish::
+	return city_buildings
+end
+
+function Trades_menu_model:move_backward_in_search_history(player)
+	self.search_history:remove_last_added_term()
+
+	local new_search = Search:new("any", "")
+
+
+	if #self.search_history >= 1 then
+		new_search = self.search_history[1]
+	end
+
+	self:update_trades_list(player, new_search, false, true)
+end
+
+---inverts the boolean filter and refreshes the GUI to reflect the filter changes
+---@param filter string
+function Trades_menu_model:invert_filter(filter)
+	self.filter[filter] = not self.filter[filter]
+end
+
+return Trades_menu_model
