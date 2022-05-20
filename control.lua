@@ -451,7 +451,7 @@ script.on_event(defines.events.on_gui_click,
 		
 		-- pagination buttons
 		elseif elem_tags.action == "switch_pagination_page" then
-			player_global.trades_menu:switch_page(player, event.element.tags.page_number)
+			player_global.trades_menu_model:switch_page(event.element.tags.page_number)
 		elseif elem_name == "pagination_first_set" then
 			player_global.trades_menu:switch_pagination_set(player, 1)
 		elseif elem_name == "pagination_previous_set" then
