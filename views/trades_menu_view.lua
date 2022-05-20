@@ -68,10 +68,16 @@ end
 
 -- clears the old trades and adds new ones
 function Trades_menu_view:update_trades_list(assemblers)
+	self.trades_list.clear()
+	if assemblers then
+		self:fill_trades_list(assemblers)
+	end
 end
 
 -- clears the old buttons and adds new ones
-function Trades_menu_view:update_pagination_buttons(assemblers)
+function Trades_menu_view:update_pagination_buttons(button_amount, set)
+	self.pagination_buttons.clear()
+	self:create_pagination_buttons(button_amount, set)
 end
 
 ----------------------------------------------------------------------
@@ -197,8 +203,8 @@ function Trades_menu_view:create_pagination(root_element)
 	root.add{type="button", caption=">>", style="tro_page_index_button", name="pagination_last_set"}
 end
 
-function Trades_menu_view:create_pagination_buttons(buttom_amount, set) 
-	for i = 1, buttom_amount do
+function Trades_menu_view:create_pagination_buttons(button_amount, set) 
+	for i = 1, button_amount do
 		self.pagination_buttons.add{
 			type = "button",
 			caption = i * set,
