@@ -203,15 +203,16 @@ function Trades_menu_view:create_pagination(root_element)
 	root.add{type="button", caption=">>", style="tro_page_index_button", name="pagination_last_set"}
 end
 
-function Trades_menu_view:create_pagination_buttons(button_amount, set) 
-	for i = 1, button_amount do
+function Trades_menu_view:create_pagination_buttons(start_num, button_amount)
+	local end_num = start_num + button_amount - 1 -- start 1 + 4 buttons = 5 buttons so - 1 to be actual button amount
+	for i = start_num, end_num do
 		self.pagination_buttons.add{
 			type = "button",
-			caption = i * set,
+			caption = i,
 			style = "tro_page_index_button",
 			tags = {
 				action = "switch_pagination_page", 
-				page_number = i * set
+				page_number = i
 			}
 		}
 	end
