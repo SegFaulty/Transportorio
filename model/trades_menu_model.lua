@@ -11,7 +11,11 @@ local Trades_menu_model = {
 		ingredients=true,
 		products=true
 	},
-	pagination_pages = {},
+	pagination ={
+		pages = {},
+		button_set = 1,
+		max_buttons_per_set = 4,
+	},
 }
 
 ----------------------------------------------------------------------
@@ -59,12 +63,17 @@ function Trades_menu_model:open_trades_menu(player)
 	local cities_entities = get_cities_entities(true, true, false)
     local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
 	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
-	self.pagination_pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
 
 	-- send data to view
-	self.trades_menu_view:update_trades_list(self.pagination_pages[1])
-	self.trades_menu_view:update_pagination_buttons(#self.pagination_pages, 1)
+	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
+	if self.pagination.max_buttons_per_set <= #self.pagination.pages then
+		self.trades_menu_view:update_pagination_buttons(1, self.pagination.max_buttons_per_set)
+	else
+		self.trades_menu_view:update_pagination_buttons(1, #self.pagination.pages)
+	end
 
+	self.pagination.button_set = 1
 	self.active = true
 end
 
@@ -97,24 +106,43 @@ end
 ---Switchs which trades are rendered based on the page selected
 ---@param page number
 function Trades_menu_model:switch_page(page)
-	if page <= #self.pagination_pages and page >= 1 then
+	if page <= #self.pagination.pages and page >= 1 then
 		self.trades_menu_view.trades_list.clear()
-		self.trades_menu_view:fill_trades_list(self.pagination_pages[page])
-		self.current_page = page
+		self.trades_menu_view:fill_trades_list(self.pagination.pages[page])
 	end
 end
 
-function Trades_menu_model:switch_pagination_set(player, set)
-	self.pagination_button_set = set
-	local pagination_buttons = self.trades_menu_view.pagination_buttons
-	pagination_buttons.clear()
-	local start = 1 + (self.max_pagination_buttons * (set - 1))
-	local amount = self.max_pagination_buttons * set
-	if #self.pagination_pages < amount then
-		local remainder = amount - #self.pagination_pages
-		amount = amount - remainder
+function Trades_menu_model:switch_pagination_set(direction)
+	local current_set = self.pagination.button_set
+	local new_set = 0
+	local last_possible_set =  math.ceil(#self.pagination.pages / self.pagination.max_buttons_per_set)
+
+	-- get the new set
+	if direction == "first" then
+		new_set = 1
+	elseif direction == "last" then
+		new_set = last_possible_set
+	elseif direction == "next" then
+		new_set = current_set + 1
+	elseif direction == "previous" then
+		new_set = current_set - 1
 	end
-	self:create_pagination_buttons(pagination_buttons, amount, start)
+
+	-- if set goes beyond min, max, or is the same, then its not valid so return
+	if new_set < 1 or new_set > last_possible_set or current_set == new_set then return end
+
+	-- figure out how many buttons and what their numbers are
+	local button_amount = self.pagination.max_buttons_per_set
+	if new_set == last_possible_set then
+		button_amount = #self.pagination.pages % self.pagination.max_buttons_per_set
+		--if there was no remainder that means it should be full
+		if button_amount == 0 then button_amount = self.pagination.max_buttons_per_set end
+	end
+	local start_num = ((new_set -1) * self.pagination.max_buttons_per_set) + 1
+
+	-- update pagination buttons
+	self.trades_menu_view:update_pagination_buttons(start_num, button_amount)
+	self.pagination.button_set = new_set
 end
 
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
@@ -126,11 +154,11 @@ function Trades_menu_model:invert_filter(player, filter)
 	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
     local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
 	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
-	self.pagination_pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
 
 	-- send data to view
-	self.trades_menu_view:update_trades_list(self.pagination_pages[1])
-	self.trades_menu_view:update_pagination_buttons(#self.pagination_pages, 1)
+	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
+	self.trades_menu_view:update_pagination_buttons(#self.pagination.pages, 1)
 end
 
 ----------------------------------------------------------------------
