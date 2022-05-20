@@ -429,8 +429,7 @@ script.on_event(defines.events.on_gui_click,
 		-- handle trades menu filter changes
 		elseif elem_tags.action == "toggle_filter" then
 			local filter = elem_tags.filter
-			player_global.trades_menu:invert_filter(filter)
-			player_global.trades_menu:refresh_trades_list(player, global.cities)
+			player_global.trades_menu_model:invert_filter(player, filter)
 
 		-- click on sprite buttons
 		elseif elem_tags.action == "tro_filter_list" then
