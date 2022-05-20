@@ -55,38 +55,15 @@ function Trades_menu_model:open_trades_menu(player)
 	player.set_shortcut_toggled("trades", true)
 	self.trades_menu_view:create(player)
 
-	local cities = global.cities
-	
-    -- get each city's assemblers
-    local cities_assemblers = {}
-    for i, city in ipairs(cities) do
-		local buildings = get_city_buildings(city, self.filter.traders, self.filter.malls, false)
-		for i, assembler in ipairs(buildings) do
-			table.insert(cities_assemblers, assembler)
-		end
-    end
-
-    -- filter assemblers by their recipe
-    local filtered_assemblers = filter_assemblers_by_recipe(cities_assemblers, "")
-
-    -- group assemblers into pages and pages into groups
-	self.pagination_pages = {}
-	local page = {}
-	local max_trades = settings.get_player_settings(player)["max-trades-per-page"].value
-	for i, assembler in ipairs(filtered_assemblers) do
-		table.insert(page, assembler)
-		if i % max_trades == 0 then -- if max trades = 100 and 100/100 has 0 remainder or 200/100 has 0 remainder (etc) then page is full
-			table.insert(self.pagination_pages, page)
-			page = {}
-		end
-	end
-	if #page > 0 then -- add last page
-		table.insert(self.pagination_pages, page)
-	end
+	-- find, filter, and group each city's entities
+	local cities_entities = get_cities_entities(true, true, false)
+    local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
+	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
+	self.pagination_pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
 
 	-- send data to view
-	self.trades_menu_view:fill_trades_list(self.pagination_pages[1])
-	self.trades_menu_view:create_pagination_buttons(#self.pagination_pages, 1)
+	self.trades_menu_view:update_trades_list(self.pagination_pages[1])
+	self.trades_menu_view:update_pagination_buttons(#self.pagination_pages, 1)
 
 	self.active = true
 end
@@ -142,28 +119,60 @@ end
 
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
 ---@param filter string
-function Trades_menu_model:invert_filter(filter)
+function Trades_menu_model:invert_filter(player, filter)
 	self.filter[filter] = not self.filter[filter]
+
+	-- find, filter, and group each city's entities
+	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
+    local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
+	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
+	self.pagination_pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+
+	-- send data to view
+	self.trades_menu_view:update_trades_list(self.pagination_pages[1])
+	self.trades_menu_view:update_pagination_buttons(#self.pagination_pages, 1)
 end
 
 ----------------------------------------------------------------------
 -- private functions
 
--- return each assembler that has the item in its recipe ingredients and / or products
-function filter_assemblers_by_recipe(assemblers, item_name, search_ingredients, search_products)
-	search_ingredients = (search_ingredients ~= false)
-	search_products = (search_products ~= false)
+-- group assemblers into pages and pages into groups
+function Trades_menu_model:split_entities_into_groups(entities, max_group_size)
+	local groups = {}
+	local group = {}
 
-	local filtered_assemblers = {}
-	
-	for i, assembler in ipairs(assemblers) do
-		local recipe = assembler.get_recipe()
-		if recipe_contains(recipe, item_name, search_ingredients, search_products) then
-			table.insert(filtered_assemblers, assembler)
+	for i, entity in ipairs(entities) do
+		table.insert(group, entity)
+
+		-- if max group size = 100 and 100/100 has 0 remainder or 200/100 has 0 remainder (etc) then page is full
+		if i % max_group_size == 0 then 
+			table.insert(groups, group)
+			group = {}
 		end
 	end
 
-	return filtered_assemblers
+	if #group > 0 then -- add last page
+		table.insert(groups, group)
+	end	
+
+	return groups
+end
+
+-- return each assembler that has the item in its recipe ingredients and / or products
+function filter_entities_by_recipe(entities, item_name, search_ingredients, search_products)
+	search_ingredients = (search_ingredients ~= false)
+	search_products = (search_products ~= false)
+
+	local filtered_entities = {}
+	
+	for i, assembler in ipairs(entities) do
+		local recipe = assembler.get_recipe()
+		if recipe_contains(recipe, item_name, search_ingredients, search_products) then
+			table.insert(filtered_entities, assembler)
+		end
+	end
+
+	return filtered_entities
 end
 
 -- check if a recipe has an item in ingredients and / or products   
@@ -192,28 +201,62 @@ function recipe_contains(recipe, item_name, search_ingredients, search_products)
 	return false
 end
 
-function get_city_buildings(city, allow_traders, allow_malls, allow_other)
-	allow_traders = (allow_traders ~= false)
-	allow_malls = (allow_malls ~= false)
-	allow_other = (allow_other ~= false)
+---Get every entity that makes up the city.
+---@param city City the city the entities are coming from
+---@param traders? boolean get a city's trader entities
+---@param malls? boolean get a city's mall entities
+---@param other? boolean get any other city entities that dont fit in a specific category
+---@return table[] city_entities an array of entities from the city
+function get_city_entities(city, traders, malls, other)
+	traders = (traders ~= false)
+	malls = (malls ~= false)
+	other = (other ~= false)
 
-	local city_buildings = {}
+	local city_entities = {}
 
 	-- retrieve each citys trader trades
-	if allow_traders == false then goto malls end
-	for i, building in ipairs(city.buildings.traders) do
-		table.insert(city_buildings, building)
+	if traders == false then goto malls end
+	for i, entity in ipairs(city.buildings.traders) do
+		table.insert(city_entities, entity)
 	end
 
 	::malls::
 	-- retrieve each citys mall trades
-	if allow_malls == false then goto finish end
-	for i, building in ipairs(city.buildings.malls) do
-		table.insert(city_buildings, building)
+	if malls == false then goto other end
+	for i, entity in ipairs(city.buildings.malls) do
+		table.insert(city_entities, entity)
+	end
+
+	::other::
+	-- retrieve each citys mall trades
+	if other == false then goto finish end
+	for i, building in ipairs(city.buildings.other) do
+		table.insert(city_entities, building)
 	end
 
 	::finish::
-	return city_buildings
+	return city_entities
+end
+
+---Get every entity that makes up each city on the map.
+---@param traders? boolean get a city's trader entities
+---@param malls? boolean get a city's mall entities
+---@param other? boolean get any other city entities that dont fit in a specific category
+---@return table[] cities_entities an array of entities from each city
+function get_cities_entities(traders, malls, other)
+	traders = (traders ~= false)
+	malls = (malls ~= false)
+	other = (other ~= false)
+	local cities = global.cities
+
+    local cities_entities = {}
+    for i, city in ipairs(cities) do
+		local entities = get_city_entities(city, traders, malls, other)
+		for i, entity in ipairs(entities) do
+			table.insert(cities_entities, entity)
+		end
+    end
+	return cities_entities
 end
 
 return Trades_menu_model
