@@ -417,7 +417,7 @@ script.on_event(defines.events.on_gui_click,
 		local elem_name = event.element.name
 		local elem_tags = event.element.tags
 		if elem_name == "tro_trade_menu_header_exit_button" then
-			player_global.trades_menu:close(player)
+			player_global.trades_menu_model:close_trades_menu(player)
 
 		elseif elem_name == "tro_ping_button" then
 			player.print("[gps=".. event.element.tags.location.x ..",".. event.element.tags.location.y .."]")
