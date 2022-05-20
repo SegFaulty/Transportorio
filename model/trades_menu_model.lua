@@ -159,7 +159,11 @@ function Trades_menu_model:invert_filter(player, filter)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
-	self.trades_menu_view:update_pagination_buttons(#self.pagination.pages, 1)
+	if self.pagination.max_buttons_per_set <= #self.pagination.pages then
+		self.trades_menu_view:update_pagination_buttons(1, self.pagination.max_buttons_per_set)
+	else
+		self.trades_menu_view:update_pagination_buttons(1, #self.pagination.pages)
+	end
 end
 
 ----------------------------------------------------------------------
