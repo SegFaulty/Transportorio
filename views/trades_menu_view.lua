@@ -6,7 +6,6 @@ Search_history = require("data.Search_history")
 ---@field max_pagination_buttons number The max amount of page buttons allowed to render at one time.
 ---@field pagination_button_set number The current set of buttons being rendered.
 local Trades_menu_view = {
-	pagination_pages = {},
 	current_page = 1,
 	max_pagination_buttons = 10,
 	pagination_button_set = 1,
@@ -47,9 +46,9 @@ end
 function Trades_menu_view:destroy(player)
 	local player_global = global.players[player.index]
 	local screen_element = player.gui.screen
-	local main_frame = screen_element["tro_trade_root_frame"]
+	local root_element = screen_element["tro_trade_root_frame"]
 
-	main_frame.destroy()
+	root_element.destroy()
 
 	-- update players state
 	self.active = not self.active
@@ -101,7 +100,7 @@ end
 
 function Trades_menu_view:fill_trades_list(assemblers)
 	local root_element = self.trades_list
-	for assembler in ipairs(assemblers) do
+	for i, assembler in ipairs(assemblers) do
 		self:create_trade_row(root_element, assembler)
 	end
 end
