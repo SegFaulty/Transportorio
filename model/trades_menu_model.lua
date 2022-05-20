@@ -14,6 +14,9 @@ local Trades_menu_model = {
 	pagination_pages = {},
 }
 
+----------------------------------------------------------------------
+-- public functions
+
 function Trades_menu_model:new(view)
 	local trades_menu_model = {
         trades_menu_view = view,
@@ -45,38 +48,6 @@ function Trades_menu_model:toggle(player)
 	else
 		self:close_trades_menu(player)
 	end
-end
-
-function Trades_menu_model:get_filtered_cities(cities, search)
-	local filtered_cities = {}
-
-	-- filter the cities trades
-	for i, city in ipairs(cities) do
-		-- get trades for each city
-		local city_trades = get_city_trades(city, self.filter.traders, self.filter.malls, false)
-
-		-- if the menu was minimized instead of closed, filter trades by last search
-		if search ~= nil then
-			city_trades = filter_assemblers_by_recipe(city_trades, search, self.filter.ingredients, self.filter.products)
-		elseif #self.search_history >= 1 then
-			local last_search = self.search_history[1].searched_item
-			city_trades = filter_assemblers_by_recipe(city_trades, last_search, self.filter.ingredients, self.filter.products)
-		end
-
-		if #city_trades == 0 then goto next_loop end
-
-		-- insert trades by group or individual
-		if self.filter.group_by_city then
-			table.insert(filtered_cities, city_trades)
-		else
-			for x, trade in ipairs(city_trades) do
-				table.insert(filtered_cities, trade)
-			end
-		end
-		::next_loop::
-	end
-
-	return filtered_cities
 end
 
 -- open the trades menu
@@ -132,6 +103,51 @@ function Trades_menu_model:minimize(player)
 	player.set_shortcut_toggled("trades", not self.active)
 	self:destroy(player)
 end
+
+function Trades_menu_model:move_backward_in_search_history(player)
+	self.search_history:remove_last_added_term()
+
+	local new_search = Search:new("any", "")
+
+
+	if #self.search_history >= 1 then
+		new_search = self.search_history[1]
+	end
+
+	self:update_trades_list(player, new_search, false, true)
+end
+
+---Switchs which trades are rendered based on the page selected
+---@param page number
+function Trades_menu_model:switch_page(page)
+	if page <= #self.pagination_pages and page >= 1 then
+		self.trades_menu_view.trades_list.clear()
+		self.trades_menu_view:fill_trades_list(self.pagination_pages[page])
+		self.current_page = page
+	end
+end
+
+function Trades_menu_model:switch_pagination_set(player, set)
+	self.pagination_button_set = set
+	local pagination_buttons = self.trades_menu_view.pagination_buttons
+	pagination_buttons.clear()
+	local start = 1 + (self.max_pagination_buttons * (set - 1))
+	local amount = self.max_pagination_buttons * set
+	if #self.pagination_pages < amount then
+		local remainder = amount - #self.pagination_pages
+		amount = amount - remainder
+	end
+	self:create_pagination_buttons(pagination_buttons, amount, start)
+end
+
+---inverts the boolean filter and refreshes the GUI to reflect the filter changes
+---@param filter string
+function Trades_menu_model:invert_filter(filter)
+	self.filter[filter] = not self.filter[filter]
+end
+
+----------------------------------------------------------------------
+-- private functions
 
 -- return each assembler that has the item in its recipe ingredients and / or products
 function filter_assemblers_by_recipe(assemblers, item_name, search_ingredients, search_products)
@@ -198,48 +214,6 @@ function get_city_buildings(city, allow_traders, allow_malls, allow_other)
 
 	::finish::
 	return city_buildings
-end
-
-function Trades_menu_model:move_backward_in_search_history(player)
-	self.search_history:remove_last_added_term()
-
-	local new_search = Search:new("any", "")
-
-
-	if #self.search_history >= 1 then
-		new_search = self.search_history[1]
-	end
-
-	self:update_trades_list(player, new_search, false, true)
-end
-
----Switchs which trades are rendered based on the page selected
----@param page number
-function Trades_menu_model:switch_page(page)
-	if page <= #self.pagination_pages and page >= 1 then
-		self.trades_menu_view.trades_list.clear()
-		self.trades_menu_view:fill_trades_list(self.pagination_pages[page])
-		self.current_page = page
-	end
-end
-
-function Trades_menu_model:switch_pagination_set(player, set)
-	self.pagination_button_set = set
-	local pagination_buttons = self.trades_menu_view.pagination_buttons
-	pagination_buttons.clear()
-	local start = 1 + (self.max_pagination_buttons * (set - 1))
-	local amount = self.max_pagination_buttons * set
-	if #self.pagination_pages < amount then
-		local remainder = amount - #self.pagination_pages
-		amount = amount - remainder
-	end
-	self:create_pagination_buttons(pagination_buttons, amount, start)
-end
-
----inverts the boolean filter and refreshes the GUI to reflect the filter changes
----@param filter string
-function Trades_menu_model:invert_filter(filter)
-	self.filter[filter] = not self.filter[filter]
 end
 
 return Trades_menu_model
