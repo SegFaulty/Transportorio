@@ -87,7 +87,8 @@ end
 -- closes gui without reseting search history
 function Trades_menu_model:minimize(player)
 	player.set_shortcut_toggled("trades", not self.active)
-	self:destroy(player)
+	self.trades_menu_view:destroy(player)
+	self.active = false
 end
 
 function Trades_menu_model:move_backward_in_search_history(player)

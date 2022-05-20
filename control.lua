@@ -424,7 +424,7 @@ script.on_event(defines.events.on_gui_click,
 
 		elseif elem_name == "tro_goto_button" then
 			player.zoom_to_world(event.element.tags.location, 1)
-			player_global.trades_menu:minimize(player)
+			player_global.trades_menu_model:minimize(player)
 
 		-- handle trades menu filter changes
 		elseif elem_tags.action == "toggle_filter" then
