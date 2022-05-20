@@ -1,6 +1,8 @@
 Search = require("data.Search")
 Search_history = require("data.Search_history")
 Trade_menu = require("scripts.gui")
+Trades_menu_view = require("views.trades_menu_view")
+Trades_menu_model = require("model.trades_menu_model")
 City = require("scripts.city_generation")
 
 DEBUG = true -- Used for debug, users should not enable
@@ -400,8 +402,10 @@ end
 script.on_event(defines.events.on_player_joined_game, 
 	function(event)
 		local player = game.get_player(event.player_index)
+		local view = Trades_menu_view:new()
 		global.players[player.index] = {
-			trades_menu = Trade_menu:new()
+			trades_menu_view = view,
+			trades_menu_model = Trades_menu_model:new(view),
 		}
 	end
 )
@@ -476,7 +480,7 @@ script.on_event(defines.events.on_lua_shortcut,
 	function(event)
 		local player = game.get_player(event.player_index)
 		if event.prototype_name == "trades" then
-			global.players[player.index].trades_menu:toggle(player)
+			global.players[player.index].trades_menu_model:toggle(player)
 		end
 	end
 )
