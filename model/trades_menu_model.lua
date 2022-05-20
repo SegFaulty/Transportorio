@@ -11,6 +11,7 @@ local Trades_menu_model = {
 		ingredients=true,
 		products=true
 	},
+	pagination_pages = {},
 }
 
 function Trades_menu_model:new(view)
@@ -37,42 +38,13 @@ function Trades_menu_model:reset_metatable(trades_menu_model_instance)
 	self.__index = self
 end
 
-pagination = {
-    { -- page group
-        { -- page
-            assembler,
-            assembler,
-            assembler,
-        },
-        { -- page
-            assembler,
-            assembler,
-            assembler,
-        },
-
-    },
-    { -- page group
-        { -- page
-            assembler,
-            assembler,
-            assembler,
-        },
-        { -- page
-            assembler,
-            assembler,
-            assembler,
-        },
-    },
-}
-
 -- opens players trade menu if closed; closes players trade menu if open
 function Trades_menu_model:toggle(player)
 	if self.active == false then
-		self.trades_menu_view:create(player)
+		self:open_trades_menu(player)
 	else
-		self.trades_menu_view:destroy(player)
+		self:close_trades_menu(player)
 	end
-	self.active = not self.active
 end
 
 function Trades_menu_model:get_filtered_cities(cities, search)
@@ -108,44 +80,51 @@ function Trades_menu_model:get_filtered_cities(cities, search)
 end
 
 -- open the trades menu
-function Trades_menu_model:open(player, cities)
+function Trades_menu_model:open_trades_menu(player)
 	player.set_shortcut_toggled("trades", true)
+	self.trades_menu_view:create(player)
 
+	local cities = global.cities
+	
     -- get each city's assemblers
     local cities_assemblers = {}
-    for city in ipairs(cities) do
-		table.insert(cities_assemblers, get_city_trades(city, self.filter.traders, self.filter.malls, false))
+    for i, city in ipairs(cities) do
+		local buildings = get_city_buildings(city, self.filter.traders, self.filter.malls, false)
+		for i, assembler in ipairs(buildings) do
+			table.insert(cities_assemblers, assembler)
+		end
     end
 
     -- filter assemblers by their recipe
-    -- filter_assemblers_by_recipe(cities_assemblers)
-    -- group assemblers into pages
-    -- group pages in groups
-    -- put groups in pagination array
-    -- send data to view
-	local filtered_cities = self:filter_cities(cities)
-	local max_trades = settings.get_player_settings(player)["max-trades-per-page"].value
+    local filtered_assemblers = filter_assemblers_by_recipe(cities_assemblers, "")
+
+    -- group assemblers into pages and pages into groups
 	self.pagination_pages = {}
-	if self.filter.group_by_city then
-		self:create_pagination_pages_by_city(max_trades, filtered_cities)
-	else
-		self:create_pagination_pages_by_assembler(max_trades, filtered_cities)
+	local page = {}
+	local max_trades = settings.get_player_settings(player)["max-trades-per-page"].value
+	for i, assembler in ipairs(filtered_assemblers) do
+		table.insert(page, assembler)
+		if i % max_trades == 0 then -- if max trades = 100 and 100/100 has 0 remainder or 200/100 has 0 remainder (etc) then page is full
+			table.insert(self.pagination_pages, page)
+			page = {}
+		end
+	end
+	if #page > 0 then -- add last page
+		table.insert(self.pagination_pages, page)
 	end
 
-	self:create(player)
+	-- send data to view
+	self.trades_menu_view:fill_trades_list(self.pagination_pages[1])
+	self.trades_menu_view:create_pagination_buttons(#self.pagination_pages, 1)
 
-	if #self.search_history >= 1 then 
-		search = self.search_history[1]
-		self:update_search_text(player, search.searched_item, search.filter) 
-	end
 	self.active = true
 end
 
 -- closes gui and resets search history
-function Trades_menu_model:close(player)
-	player.set_shortcut_toggled("trades", not self.active)
-	self:destroy(player)
-	self.search_history:reset()
+function Trades_menu_model:close_trades_menu(player)
+	player.set_shortcut_toggled("trades", false)
+	self.trades_menu_view:destroy(player)
+	self.active = false
 end
 
 -- closes gui without reseting search history
@@ -206,14 +185,14 @@ function get_city_buildings(city, allow_traders, allow_malls, allow_other)
 
 	-- retrieve each citys trader trades
 	if allow_traders == false then goto malls end
-	for building in ipairs(city.buildings.traders) do
+	for i, building in ipairs(city.buildings.traders) do
 		table.insert(city_buildings, building)
 	end
 
 	::malls::
 	-- retrieve each citys mall trades
 	if allow_malls == false then goto finish end
-	for building in ipairs(city.buildings.malls) do
+	for i, building in ipairs(city.buildings.malls) do
 		table.insert(city_buildings, building)
 	end
 
@@ -232,6 +211,29 @@ function Trades_menu_model:move_backward_in_search_history(player)
 	end
 
 	self:update_trades_list(player, new_search, false, true)
+end
+
+---Switchs which trades are rendered based on the page selected
+---@param page number
+function Trades_menu_model:switch_page(page)
+	if page <= #self.pagination_pages and page >= 1 then
+		self.trades_menu_view.trades_list.clear()
+		self.trades_menu_view:fill_trades_list(self.pagination_pages[page])
+		self.current_page = page
+	end
+end
+
+function Trades_menu_model:switch_pagination_set(player, set)
+	self.pagination_button_set = set
+	local pagination_buttons = self.trades_menu_view.pagination_buttons
+	pagination_buttons.clear()
+	local start = 1 + (self.max_pagination_buttons * (set - 1))
+	local amount = self.max_pagination_buttons * set
+	if #self.pagination_pages < amount then
+		local remainder = amount - #self.pagination_pages
+		amount = amount - remainder
+	end
+	self:create_pagination_buttons(pagination_buttons, amount, start)
 end
 
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
