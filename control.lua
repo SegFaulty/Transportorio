@@ -436,12 +436,8 @@ script.on_event(defines.events.on_gui_click,
 			local tag = event.element.tags
 			local search = {}
 			if event.button == 4 then -- right mouse button
-				player_global.trades_menu_model.filter.ingredients = true
-				player_global.trades_menu_model.filter.products = false
 				search = Search:new("ingredients", tag.item_name, tag.type)
 			elseif event.button == 2 then -- left mouse button
-				player_global.trades_menu_model.filter.products = true
-				player_global.trades_menu_model.filter.ingredients = false
 				search = Search:new("products", tag.item_name)
 			end
 			player_global.trades_menu_model:search_for_item(player, search)
