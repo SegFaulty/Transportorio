@@ -59,17 +59,24 @@ function Trades_menu_model:open_trades_menu(player)
 	player.set_shortcut_toggled("trades", true)
 	self.trades_menu_view:create(player)
 
-	-- find, filter, and group each city's entities
-	local cities_entities = get_cities_entities(true, true, false)
-    local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
-	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
-	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+	-- create data
+	self:create_view_data(player)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
 	self:create_pagination_button_set(1)
 
 	self.active = true
+end
+
+-- searchs each city for entities with the item in the recipe
+function Trades_menu_model:search_for_item(player, search)
+	-- create data
+	self:create_view_data(player, search.searched_item)
+
+	-- send data to view
+	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
+	self:create_pagination_button_set(1)
 end
 
 -- closes gui and resets search history
@@ -132,11 +139,8 @@ end
 function Trades_menu_model:invert_filter(player, filter)
 	self.filter[filter] = not self.filter[filter]
 
-	-- find, filter, and group each city's entities
-	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
-    local filtered_assemblers = filter_entities_by_recipe(cities_entities, "")
-	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
-	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+	-- create data
+	self:create_view_data(player)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
@@ -145,6 +149,16 @@ end
 
 ----------------------------------------------------------------------
 -- private functions
+
+-- searches each city on the map for any entities matching the models filters and then
+-- creates a table of data thats parsable for the trades_menu_view
+function Trades_menu_model:create_view_data(player, item_name)
+	item_name = item_name or "" -- default to any item
+	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
+    local filtered_assemblers = filter_entities_by_recipe(cities_entities, item_name, self.filter.ingredients, self.filter.products)
+	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
+	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
+end
 
 -- group assemblers into pages and pages into groups
 function Trades_menu_model:split_entities_into_groups(entities, max_group_size)
