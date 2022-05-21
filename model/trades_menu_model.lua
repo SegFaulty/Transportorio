@@ -155,7 +155,7 @@ function Trades_menu_model:create_view_data(player, item_name, filter)
 	local search_ingredients = true
 	local search_products = true
 
-	if filter == "search_" then search_products = false
+	if filter == "ingredients" then search_products = false
 	elseif filter == "products" then search_ingredients = false end
 
 	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
