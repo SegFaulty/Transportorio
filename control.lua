@@ -440,7 +440,7 @@ script.on_event(defines.events.on_gui_click,
 			elseif event.button == 2 then -- left mouse button
 				search = Search:new("products", tag.item_name)
 			end
-			player_global.trades_menu_model:search_for_item(player, search)
+			player_global.trades_menu_model:search_for_item(player, search, true)
 		elseif elem_name == "tro_move_back_in_search_history_button" then
 			player_global.trades_menu:move_backward_in_search_history(player)
 		
@@ -473,7 +473,7 @@ script.on_event(defines.events.on_gui_text_changed,
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		local new_search = event.element.text
-		player_global.trades_menu_model:search_for_item(player, convert_search_text_to_search_object(new_search))
+		player_global.trades_menu_model:search_for_item(player, convert_search_text_to_search_object(new_search), false)
 	end
 )
 

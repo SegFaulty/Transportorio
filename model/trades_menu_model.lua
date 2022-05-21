@@ -68,13 +68,17 @@ function Trades_menu_model:open_trades_menu(player)
 end
 
 -- searchs each city for entities with the item in the recipe
-function Trades_menu_model:search_for_item(player, search)
+function Trades_menu_model:search_for_item(player, search, update_search_bar)
 	-- create data
 	self:create_view_data(player, search.item_name, search.filter)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
 	self:create_pagination_button_set(1)
+
+	if update_search_bar then
+		self.trades_menu_view:update_search_text(player, search.item_name, search.filter)
+	end
 end
 
 -- closes gui and resets search history
