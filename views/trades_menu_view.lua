@@ -75,9 +75,9 @@ function Trades_menu_view:update_trades_list(assemblers)
 end
 
 -- clears the old buttons and adds new ones
-function Trades_menu_view:update_pagination_buttons(button_amount, set)
+function Trades_menu_view:update_pagination_buttons(button_start_num, button_amount)
 	self.pagination_buttons.clear()
-	self:create_pagination_buttons(button_amount, set)
+	self:create_pagination_buttons(button_start_num, button_amount)
 end
 
 ----------------------------------------------------------------------
