@@ -70,7 +70,7 @@ end
 -- searchs each city for entities with the item in the recipe
 function Trades_menu_model:search_for_item(player, search)
 	-- create data
-	self:create_view_data(player, search.searched_item, search.filter)
+	self:create_view_data(player, search.item_name, search.filter)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])

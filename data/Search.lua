@@ -1,13 +1,13 @@
 local Search = {
 	filter="any", -- any, product, ingredient
-	searched_item="",
+	item_name="",
 	item_type="unknown"
 }
 
 -- create a new search table
-function Search:new(filter, searched_item, item_type)
+function Search:new(filter, item_name, item_type)
 	item_type = item_type or self.item_type
-	search = {filter=filter, searched_item=searched_item, item_type=item_type}
+	search = {filter=filter, item_name=item_name, item_type=item_type}
 	setmetatable(search, self)
 	self.__index = self
 
