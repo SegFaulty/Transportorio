@@ -67,13 +67,8 @@ function Trades_menu_model:open_trades_menu(player)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
-	if self.pagination.max_buttons_per_set <= #self.pagination.pages then
-		self.trades_menu_view:update_pagination_buttons(1, self.pagination.max_buttons_per_set)
-	else
-		self.trades_menu_view:update_pagination_buttons(1, #self.pagination.pages)
-	end
+	self:create_pagination_button_set(1)
 
-	self.pagination.button_set = 1
 	self.active = true
 end
 
@@ -129,21 +124,7 @@ function Trades_menu_model:switch_pagination_set(direction)
 		new_set = current_set - 1
 	end
 
-	-- if set goes beyond min, max, or is the same, then its not valid so return
-	if new_set < 1 or new_set > last_possible_set or current_set == new_set then return end
-
-	-- figure out how many buttons and what their numbers are
-	local button_amount = self.pagination.max_buttons_per_set
-	if new_set == last_possible_set then
-		button_amount = #self.pagination.pages % self.pagination.max_buttons_per_set
-		--if there was no remainder that means it should be full
-		if button_amount == 0 then button_amount = self.pagination.max_buttons_per_set end
-	end
-	local start_num = ((new_set -1) * self.pagination.max_buttons_per_set) + 1
-
-	-- update pagination buttons
-	self.trades_menu_view:update_pagination_buttons(start_num, button_amount)
-	self.pagination.button_set = new_set
+	self:create_pagination_button_set(new_set)
 end
 
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
@@ -159,11 +140,7 @@ function Trades_menu_model:invert_filter(player, filter)
 
 	-- send data to view
 	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
-	if self.pagination.max_buttons_per_set <= #self.pagination.pages then
-		self.trades_menu_view:update_pagination_buttons(1, self.pagination.max_buttons_per_set)
-	else
-		self.trades_menu_view:update_pagination_buttons(1, #self.pagination.pages)
-	end
+	self:create_pagination_button_set(1)
 end
 
 ----------------------------------------------------------------------
@@ -189,6 +166,27 @@ function Trades_menu_model:split_entities_into_groups(entities, max_group_size)
 	end	
 
 	return groups
+end
+
+function Trades_menu_model:create_pagination_button_set(set)
+	local last_possible_set =  math.ceil(#self.pagination.pages / self.pagination.max_buttons_per_set)
+
+	-- no results
+	if last_possible_set == 0 then self.trades_menu_view:update_pagination_buttons(0,0) end
+	-- invalid set
+	if set < 1 or set > last_possible_set then return end
+	
+	-- figure out how many buttons and what their numbers are
+	local button_amount = self.pagination.max_buttons_per_set
+	if set == last_possible_set then
+		button_amount = #self.pagination.pages % self.pagination.max_buttons_per_set
+		--if there was no remainder that means it should be full
+		if button_amount == 0 then button_amount = self.pagination.max_buttons_per_set end
+	end
+	local start_num = ((set -1) * self.pagination.max_buttons_per_set) + 1
+
+	self.trades_menu_view:update_pagination_buttons(start_num, button_amount)
+	self.pagination.button_set = set
 end
 
 -- return each assembler that has the item in its recipe ingredients and / or products
