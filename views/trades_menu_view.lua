@@ -106,6 +106,7 @@ function Trades_menu_view:create_filter_options(root_element)
 	filter_flow.add{
 		type="button",
 		caption="back",
+		tags={action="tro_move_back_in_search_history"},
 		tooltip = {"tro.trade_menu_back_but"}
 	}	filter_flow.add{
 		type="button",

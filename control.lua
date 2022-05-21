@@ -440,10 +440,10 @@ script.on_event(defines.events.on_gui_click,
 			elseif event.button == 2 then -- left mouse button
 				search = Search:new("products", tag.item_name)
 			end
-			player_global.trades_menu_model:search_for_item(player, search, true)
-		elseif elem_name == "tro_move_back_in_search_history_button" then
-			player_global.trades_menu:move_backward_in_search_history(player)
-		
+			player_global.trades_menu_model:search_for_item(player, search, true, true)
+		elseif elem_tags.action == "tro_move_back_in_search_history" then
+			player_global.trades_menu_model:move_backward_in_search_history(player)
+
 		-- pagination buttons
 		elseif elem_tags.action == "switch_pagination_page" then
 			player_global.trades_menu_model:switch_page(event.element.tags.page_number)
@@ -473,7 +473,7 @@ script.on_event(defines.events.on_gui_text_changed,
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		local new_search = event.element.text
-		player_global.trades_menu_model:search_for_item(player, convert_search_text_to_search_object(new_search), false)
+		player_global.trades_menu_model:search_for_item(player, convert_search_text_to_search_object(new_search), false, false)
 	end
 )
 
@@ -481,7 +481,7 @@ script.on_event("tro_move_backwards_in_search_history",
 	function(event)
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
-		player_global.trades_menu:move_backward_in_search_history(player)
+		player_global.trades_menu_model:move_backward_in_search_history(player)
 	end
 )
 

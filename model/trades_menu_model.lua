@@ -57,18 +57,24 @@ function Trades_menu_model:open_trades_menu(player)
 	player.set_shortcut_toggled("trades", true)
 	self.trades_menu_view:create(player)
 
-	-- create data
-	self:create_view_data(player)
-
-	-- send data to view
-	self.trades_menu_view:update_trades_list(self.pagination.pages[1])
-	self:create_pagination_button_set(1)
+	
+	if #self.search_history >= 1 then 
+		local search = self.search_history[1]
+		self:search_for_item(player, search, true, false)
+	else
+		-- create data
+		self:create_view_data(player)
+		
+		-- send data to view
+		self.trades_menu_view:update_trades_list(self.pagination.pages[1])
+		self:create_pagination_button_set(1)
+	end
 
 	self.active = true
 end
 
 -- searchs each city for entities with the item in the recipe
-function Trades_menu_model:search_for_item(player, search, update_search_bar)
+function Trades_menu_model:search_for_item(player, search, update_search_bar, add_to_search_history)
 	-- create data
 	self:create_view_data(player, search.item_name, search.filter)
 
@@ -78,6 +84,10 @@ function Trades_menu_model:search_for_item(player, search, update_search_bar)
 
 	if update_search_bar then
 		self.trades_menu_view:update_search_text(player, search.item_name, search.filter)
+	end
+
+	if add_to_search_history then
+		self.search_history:add_search(search)
 	end
 end
 
@@ -100,12 +110,11 @@ function Trades_menu_model:move_backward_in_search_history(player)
 
 	local new_search = Search:new("any", "")
 
-
 	if #self.search_history >= 1 then
 		new_search = self.search_history[1]
 	end
 
-	self:update_trades_list(player, new_search, false, true)
+	self:search_for_item(player, new_search, true, false)
 end
 
 ---Switchs which trades are rendered based on the page selected
