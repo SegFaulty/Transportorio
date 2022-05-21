@@ -473,7 +473,7 @@ script.on_event(defines.events.on_gui_text_changed,
 		local player = game.get_player(event.player_index)
 		local player_global = global.players[player.index]
 		local new_search = event.element.text
-		player_global.trades_menu:update_trades_list(player, convert_search_text_to_search_object(new_search), false, false)
+		player_global.trades_menu_model:search_for_item(player, convert_search_text_to_search_object(new_search))
 	end
 )
 
