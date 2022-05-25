@@ -24,12 +24,15 @@ function Trades_menu_model:new(view)
         trades_menu_view = view,
         active = false,
         search_history = Search_history:new(),
-        filter = {
+        categories = {
             traders=true,
             malls=true,
-            ingredients=true,
-            products=true
         },
+		pagination ={
+			pages = {},
+			button_set = 1,
+			max_buttons_per_set = 10,
+		},
 	}
 	setmetatable(trades_menu_model, self)
 	self.__index = self
@@ -147,7 +150,8 @@ end
 ---inverts the boolean filter and refreshes the GUI to reflect the filter changes
 ---@param filter string
 function Trades_menu_model:invert_filter(player, filter)
-	self.filter[filter] = not self.filter[filter]
+	self.categories[filter] = not self.categories[filter]
+
 
 	-- create data
 	self:create_view_data(player)
@@ -170,8 +174,8 @@ function Trades_menu_model:create_view_data(player, item_name, filter)
 	if filter == "ingredients" then search_products = false
 	elseif filter == "products" then search_ingredients = false end
 
-	local cities_entities = get_cities_entities(self.filter.traders, self.filter.malls, false)
-    local filtered_assemblers = filter_entities_by_recipe(cities_entities, item_name, search_ingredients, search_products)
+	local cities_entities = get_cities_entities(self.categories.traders, self.categories.malls, false)
+	local filtered_assemblers = filter_entities_by_recipe(cities_entities, item_name, search_ingredients, search_products)
 	local max_group_size = settings.get_player_settings(player)["max-trades-per-page"].value
 	self.pagination.pages = self:split_entities_into_groups(filtered_assemblers, max_group_size)
 end
