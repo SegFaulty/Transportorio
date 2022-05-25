@@ -12,7 +12,7 @@ local Trades_menu_model = {
 	pagination ={
 		pages = {},
 		button_set = 1,
-		max_buttons_per_set = 4,
+		max_buttons_per_set = 10,
 	},
 }
 
@@ -57,14 +57,13 @@ function Trades_menu_model:open_trades_menu(player)
 	player.set_shortcut_toggled("trades", true)
 	self.trades_menu_view:create(player)
 
-	
-	if #self.search_history >= 1 then 
+	if #self.search_history >= 1 then
 		local search = self.search_history[1]
 		self:search_for_item(player, search, true, false)
 	else
 		-- create data
 		self:create_view_data(player)
-		
+
 		-- send data to view
 		self.trades_menu_view:update_trades_list(self.pagination.pages[1])
 		self:create_pagination_button_set(1)
