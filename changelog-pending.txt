@@ -11,10 +11,12 @@ Date: 2022-06-16
     - add clear search string button, change back in search to button with icon
     - change stateless buttons group, traders, mall to stateful check box and switch
     - show correct product ratio (with probality) and merge same products
+    - added check if search term is exact entity name then no other items shown (stone vs stone-brick)
 
   Bugfixes:
     - init search field with last search term
     - don't show search term any
+    - fixed click on stone shows stone-brick too
 
 
 ---------------------------------------------------------------------------------------------------
