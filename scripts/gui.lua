@@ -56,17 +56,33 @@ function Trades_menu:open(player)
 	filter_flow = root_frame.add{type="flow", direction="horizontal", name="tro_filter_bar"}
 	filter_flow.add{type="textfield", name="tro_trade_menu_search", tooltip = {"tro.trade_menu_textfield"}}
 	filter_flow.add{
-		type="button",
-		caption="back",
+        type = "sprite-button",
+        name = "tro_trade_menu_clear_search_button",
+        style = "tool_button",
+        sprite = "utility/close_black",
+        hovered_sprite = "utility/close_white",
+        clicked_sprite = "utility/close_white",
+        tooltip = {"tro.trade_menu_clear_search"}
+    }
+    filter_flow.add{
+        type = "sprite-button",
 		name="tro_move_back_in_search_history_button",
-		tooltip = {"tro.trade_menu_back_but"}
-	}	filter_flow.add{
+        style = "tool_button",
+        sprite = "utility/reset",
+        tooltip = {"tro.trade_menu_back_but"},
+        enabled = true -- #self.search_history >= 1
+	}
+
+    filter_flow.add{type="label", name="tro_trade_menu_spacer", caption="     "}
+
+	filter_flow.add{
 		type="button",
 		caption="group",
 		name="tro_group_trades_button",
 		tooltip = {"tro.group_trades_button"},
 		style="tro_trade_group_button",
-	}	filter_flow.add{
+	}
+	filter_flow.add{
 		type="button",
 		caption="trades",
 		name="tro_allow_trades_button",

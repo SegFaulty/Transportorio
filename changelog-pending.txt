@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.0.10
+Date: 2022-06-16
+
+
+
+  Changes:
+    - hide trades in unrevealed map areas, assembler needs to be visible on the map
+  GUI:
+    - add clear search string button, change back i search to button with icon
+
+  Bugfixes:
+    - init search field with last search term
+    - don't show search term any
+
+
+---------------------------------------------------------------------------------------------------
