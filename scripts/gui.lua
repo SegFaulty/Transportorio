@@ -76,24 +76,30 @@ function Trades_menu:open(player)
     filter_flow.add{type="label", name="tro_trade_menu_spacer", caption="     "}
 
 	filter_flow.add{
-		type="button",
-		caption="group",
-		name="tro_group_trades_button",
+        type="checkbox",
+		caption="Cities",
+        name="tro_group_trades_checkbox",
 		tooltip = {"tro.group_trades_button"},
-		style="tro_trade_group_button",
+        state = player_global.trades_menu.filter.group_by_city
 	}
-	filter_flow.add{
-		type="button",
-		caption="trades",
-		name="tro_allow_trades_button",
-		tooltip = {"tro.allow_trades_button"},
 
-	}	filter_flow.add{
-		type="button",
-		caption="malls",
-		name="tro_allow_malls_button",
-		tooltip = {"tro.allow_malls_button"}
-	}
+    filter_flow.add{type="label", name="tro_trade_menu_group_spacer", caption="     "}
+
+    local switch_state = "none"
+    if player_global.trades_menu.filter.traders == false then
+        switch_state = "right"
+    elseif player_global.trades_menu.filter.malls == false then
+        switch_state = "left"
+    end
+	filter_flow.add{
+        type="switch",
+        name="tro_switch_traders_or_malls" ,
+        allow_none_state=true,
+        switch_state=switch_state ,
+        left_label_caption={"tro.switch_traders_only"}, left_label_tooltip={"tro.switch_traders_only_tooltip"},
+        right_label_caption={"tro.switch_malls_only"}, right_label_tooltip={"tro.switch_malls_only_tooltip"}
+    }
+
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
 
 	if #self.search_history >= 1 then
