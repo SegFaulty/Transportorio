@@ -342,19 +342,25 @@ function Trades_menu:create_row(list, assembler)
 	-- create row buttons
 	local trade_row_flow = trade_row.add{type="flow", style="tro_trade_row_flow"}
 	trade_row_flow.add{
-		type="button",
-		caption="ping",
+        type = "sprite-button",
 		name="tro_ping_button",
-		tags={location=position}, 
+        sprite = "utility/center",
+        style = "tool_button",
+		tags={location=position},
 		tooltip={"tro.trade_menu_ping"}
 	}
-	trade_row_flow.add{type="button",
-		caption="goto",
+
+    trade_row_flow.add{
+        type = "sprite-button",
 		name="tro_goto_button",
+        sprite = "utility/search_black",
+        style = "tool_button",
 		tags={location=position},
 		tooltip={"tro.trade_menu_goto"}
 	}
-	
+
+    trade_row_flow.add{type="label", name="tro_trade_menu_spacer", caption="     "}
+
 	-- create sprite buttons and labels for each ingredient and product
 	if #ingredients >= 1 then
 		for i, ingredient in ipairs(ingredients) do
@@ -375,8 +381,38 @@ function Trades_menu:create_row(list, assembler)
 
 	trade_row_flow.add{type="label", caption = " --->"}
 
+    local last_button = nil
+    local last_amount = 0.0
 	for i, product in ipairs(products) do
-		trade_row_flow.add{
+
+        -- calculate the precise product amount
+        local product_amount = 0.0
+        if product.amount ~= nil then
+            product_amount = product.amount
+        end
+        if product.amount_min~=nil and product.amount_max~=nil then
+            product_amount = product.amount_min * product.amount_max / 2 -- average of min and max
+        end
+        if product.probability~=nil then
+            product_amount = product_amount * product.probability
+        end
+        -- round to 4 digits
+        product_amount = math.floor(product_amount * 10^4 + 0.5) / 10^4
+
+        if last_button~=nil then
+            if last_button.sprite == product.type .. "/" .. product.name then
+                -- same item so we only add the new amount
+                product_amount = last_amount + product_amount
+            else
+                -- not the same item   show it
+                trade_row_flow.add(last_button)
+                trade_row_flow.add {type="label", caption = last_amount }
+            end
+
+        end
+
+        last_amount =  product_amount
+        last_button = {
 			type="sprite-button",
 			sprite = product.type .. "/" .. product.name, 
 			tags={
@@ -387,8 +423,12 @@ function Trades_menu:create_row(list, assembler)
 			},
 			tooltip={"", {"tro.item_name"}, ": ", product.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
 		}
-		trade_row_flow.add{type="label", caption = product.amount}
+
 	end
+
+    trade_row_flow.add(last_button)
+    trade_row_flow.add {type="label", caption = last_amount }
+
 end
 
 function Trades_menu:move_backward_in_search_history(player)

@@ -10,6 +10,7 @@ Date: 2022-06-16
   GUI:
     - add clear search string button, change back in search to button with icon
     - change stateless buttons group, traders, mall to stateful check box and switch
+    - show correct product ratio (with probality) and merge same products
 
   Bugfixes:
     - init search field with last search term
