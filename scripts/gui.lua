@@ -84,6 +84,7 @@ function Trades_menu:open(player)
 		local search_term = self.search_history[1].searched_item
 		local filter = self.search_history[1].filter
 		self:create_list_rows(trades_list, global.cities, search_term, filter, player)
+        self:update_search_text(player, search_term, filter)
 	else
 		-- search for all
 		self:create_list_rows(trades_list, global.cities, "", player)
@@ -122,9 +123,9 @@ end
 -- updates the GUI search box
 function Trades_menu:update_search_text(player, search, filter)
 	local textfield = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
-	local text = filter .. ":" .. search
+	local text = ""
 
-	if filter == nil then
+    if filter == nil or filter == "any" then
 		text = search
 	else
 		text = filter .. ":" .. search
