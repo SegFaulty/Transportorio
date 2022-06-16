@@ -12,6 +12,7 @@ Date: 2022-06-16
     - change stateless buttons group, traders, mall to stateful check box and switch
     - show correct product ratio (with probality) and merge same products
     - added check if search term is exact entity name then no other items shown (stone vs stone-brick)
+    - added button to export all trades as transportorio-trades.csv to script-output dir
 
   Bugfixes:
     - init search field with last search term

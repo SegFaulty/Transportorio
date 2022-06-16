@@ -100,6 +100,18 @@ function Trades_menu:open(player)
         right_label_caption={"tro.switch_malls_only"}, right_label_tooltip={"tro.switch_malls_only_tooltip"}
     }
 
+	local filler = filter_flow.add{type="empty-widget"}
+	filler.style.horizontally_stretchable = true
+
+    filter_flow.add{
+        type = "sprite-button",
+        name = "tro_export_trades_csv",
+        style = "tool_button",
+        sprite = "utility/downloading",
+        horizontal_align = "right",
+        tooltip = "export all trades as transportorio-trades.csv to script-output dir"
+    }
+
 	local trades_list = root_frame.add{type="scroll-pane", name="tro_trades_list", direction="vertical", style="inventory_scroll_pane"}
 
 	if #self.search_history >= 1 then

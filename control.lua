@@ -471,13 +471,63 @@ script.on_event(defines.events.on_gui_click,
 				search = Search:new("products", tag.item_name)
 			end
 			player_global.trades_menu:update_trades_list(player, search, true, true)
+
 		elseif event.element.name == "tro_move_back_in_search_history_button" then
 			player_global.trades_menu:move_backward_in_search_history(player)
-			elseif event.element.name == "tro_trade_menu_clear_search_button" then
-				player_global.trades_menu:update_trades_list(player,  convert_search_text_to_search_object(""), false, true)
+
+		elseif event.element.name == "tro_trade_menu_clear_search_button" then
+			player_global.trades_menu:update_trades_list(player,  convert_search_text_to_search_object(""), false, true)
+
+		elseif event.element.name == "tro_export_trades_csv" then
+
+			local file_name = "transportorio-trades.csv"
+			local csvheader = "city,type,assembler,x,y,recipe,input,products,time" .. "\n"
+			game.write_file("transportorio-trades.csv", csvheader)
+
+
+			for city_index, city in ipairs(global.cities) do
+				for x, assembler in ipairs(city.buildings.traders) do
+					exportTrade(file_name, city_index, assembler, 'trader')
+				end
+				for x, assembler in ipairs(city.buildings.malls) do
+					exportTrade(file_name, city_index, assembler, 'mall')
+				end
+			end
+
 		end
 	end
 )
+
+function exportTrade(file_name, city_index, assembler, type)
+	local line = ""
+	local recipe = assembler.get_recipe()
+	if recipe ~= nil then
+		line = city_index
+		line = line .. "," .. type
+		line = line .. "," .. assembler.name .. "," .. assembler.position.x .. "," .. assembler.position.y
+		line = line .. "," .. recipe.name
+		local input = ""
+		for i, ingredient in ipairs(recipe.ingredients) do
+			if input ~= "" then
+				input = input .. "|"
+			end
+			input = input .. ingredient.amount .. "x" .. ingredient.name
+		end
+		line = line .. "," .. input
+		local output = ""
+		for i, product in ipairs(recipe.products) do
+			if output ~= "" then
+				output = output .. "|"
+			end
+			output = output .. product.amount .. "x" .. product.probability .. "x" .. product.name
+		end
+		line = line .. "," .. output
+		line = line .. "," .. recipe.energy
+		line = line .. "\n"
+		game.write_file(file_name, line, true)
+	end
+
+end
 
 script.on_event(defines.events.on_lua_shortcut,
 	function(event)
