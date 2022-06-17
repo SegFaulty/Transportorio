@@ -287,7 +287,8 @@ function Trades_menu:create_list_rows(list, cities, search_term, player)
 	local cities_trades = {}
 
 	-- filter which city trades are allowed
-	for i, city in ipairs(cities) do
+    for city_index, city in ipairs(cities) do
+
 		local city_trades = {}
 		if self.filter.traders then
 			for x, building in ipairs(city.buildings.traders) do
@@ -306,29 +307,145 @@ function Trades_menu:create_list_rows(list, cities, search_term, player)
 		end
 		if #city_trades > 0 then
 			table.insert(cities_trades, city_trades)
-		end
-	end
 
-	-- create the list rows
-	if #cities_trades > 0 then
-		-- create a row for each recipe for each assembler
-		for i, city_trades in ipairs(cities_trades) do
+			local city_name = ""
+			local city_name_map = self:get_city_name_from_map(city)
+			if city_name_map ~= "" then
+				city_name = city_name_map
+			else
+				city_name = self:get_city_name_generated(city, city_index)
+			end
+
 			if self.filter.group_by_city and #city_trades > 0 then
 				grouped_list = list.add{type="frame", direction="vertical", style="inner_frame_in_outer_frame"}
+
+				city_header = grouped_list.add{type="flow", direction="horizontal"}
+				city_header.add{type="label", caption=city_name, style="frame_title"}
+
+				--local filler = city_header.add{type="empty-widget"}
+				--filler.style.horizontally_stretchable = true
+
+				if city_name_map == "" then
+					city_header.add{
+						type = "sprite-button",
+						name = "tro_tag_city",
+						style = "frame_action_button",
+						sprite = "utility/downloading_white",
+						tags={position = city.center, text = city_name},
+						tooltip = "add a name tag on the city, you can rename the city by editing the tag"
+					}
+				end
+
+
+
+
 				for x, trade in ipairs(city_trades) do
 					self:create_row(grouped_list, trade)
 				end
 				table.insert(list, grouped_list)
 			elseif self.filter.group_by_city == false then
 				for x, trade in ipairs(city_trades) do
-					self:create_row(list, trade)
+                    self:create_row(list, trade, city_name)
 				end
 			end
 		end
-	else 
+    end
+
+    -- create the list rows
+    if #cities_trades > 0 then
+
+	else
 		-- if list is empty, create a message saying as much
 		local message_element = self:create_failed_search_message(list, player, search_term)
 	end
+end
+
+-- try to read the city name from a map tag or if nothing found generate it
+function Trades_menu:get_city_name(city, city_index)
+
+	local city_name = self:get_city_name_from_map(city)
+
+	if city_name == "" then
+		city_name = self:get_city_name_generated(city, city_index)
+	end
+
+	return city_name
+end
+
+-- read the city from a map tag -- if no map tag found empty "" name returned
+function Trades_menu:get_city_name_from_map(city)
+	local city_name = ""
+
+	-- check for city name tag on the exact position an the map
+	local name_tags = game.forces.player.find_chart_tags(game.surfaces[1], {{city.center.x, city.center.y} , {city.center.x+1, city.center.y+1}} )   -- area of one tile seem not to work {city.center, city.center}
+	for i, tag in pairs (name_tags) do
+		if tag.position.x == city.center.x or tag.position.y == city.center.y  then -- only exact matching tags, because the science tags are 0.5 tiles off    dont know why
+			--if tag and tag.icon then
+			--	city_name = city_name .. tag.icon.name .. " "
+			--end
+			if tag and tag.text then
+				city_name = city_name .. tag.text
+			end
+		end
+	end
+
+	return city_name
+end
+
+-- generate a creative informative unique name for the city
+function Trades_menu:get_city_name_generated(city, city_index)
+	local city_name = ""
+
+	if city_name == ""  then
+
+		city_name = city_name .. city_index
+
+		-- compass N = 0  $deg = (atan2($y, $x) * (180/3.14) + 360) % 360;
+
+		local orientation = math.floor( ( math.atan2(city.center.x, -city.center.y) * (180 / 3.14) +360 ) % 360 ) -- y north = negative
+		city_name = city_name .. " " .. orientation
+
+		-- distance $d = sqrt(pow($x, 2) + pow($y, 2) );
+		local distance = math.floor( math.sqrt( city.center.x^2 + city.center.y^2 )  / 32 )
+		city_name = city_name .. " " .. distance
+
+		local orient_names = { "Nor", "Nore" , "Easo", "Eas", "Easu" , "Soue", "Sou", "Souw" , "Wesu", "Wes", "Weso" }
+
+		city_name = city_name .. " " .. orient_names[math.ceil(orientation / (360 / #orient_names))]
+
+
+
+		--if string.sub(i,-4,-4) ~= "" then
+		--	city_name = city_name .. "[virtual-signal=signal-" .. string.sub(i, -4, -4) .. "]"
+		--end
+		--if string.sub(i,-3,-3) ~= "" then
+		--	city_name = city_name .. "[virtual-signal=signal-" .. string.sub(i, -3, -3) .. "]"
+		--end
+		--if string.sub(i,-2,-2) ~= "" then
+		--	city_name = city_name .. "[virtual-signal=signal-" .. string.sub(i, -2, -2) .. "]"
+		--end
+		--if string.sub(i,-1,-1) ~= "" then
+		--	city_name = city_name .. "[virtual-signal=signal-" .. string.sub(i, -1, -1) .. "]"
+		--end
+
+		city_name = city_name .. " "
+
+		if city.center.y >= 0 then
+			city_name = city_name .. "Su"
+		else
+			city_name = city_name .. "No"
+		end
+		city_name = city_name .. math.floor( math.abs(city.center.y) / 32 )
+		if city.center.x >= 0 then
+			city_name = city_name .. "e"
+		else
+			city_name = city_name .. "w"
+		end
+		city_name = city_name .. math.floor( math.abs(city.center.x) / 32 )
+
+	end
+
+	return city_name
 end
 
 -- creates a ui explaining the search for an item failed as well as next steps
@@ -360,7 +477,7 @@ function Trades_menu:create_failed_search_message(list, player, search_term)
 	end
 end
 
-function Trades_menu:create_row(list, assembler)
+function Trades_menu:create_row(list, assembler, city_name)
 	-- disassemble assembler into usable parts
 	local recipe = assembler.get_recipe()
 	local position = assembler.position
@@ -388,6 +505,17 @@ function Trades_menu:create_row(list, assembler)
 		tags={location=position},
 		tooltip={"tro.trade_menu_goto"}
 	}
+
+    if city_name ~= nil  then
+        trade_row_flow.add{
+            type = "button",
+            name = "tro_city_name",
+            caption = city_name,
+            --	style = "tool_button",
+            width = 50,
+            tooltip = city_name
+        }
+    end
 
     trade_row_flow.add{type="label", name="tro_trade_menu_spacer", caption="     "}
 

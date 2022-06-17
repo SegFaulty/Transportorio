@@ -457,6 +457,10 @@ script.on_event(defines.events.on_gui_click,
 			player_global.trades_menu.filter.malls = not player_global.trades_menu.filter.malls
 			player_global.trades_menu:refresh_trades_list(player)
 
+		elseif event.element.name == "tro_tag_city" then
+			player.print("x" .. event.element.tags.text)
+			game.forces.player.add_chart_tag(game.surfaces[1], {position = event.element.tags.position, text = event.element.tags.text } )
+
 		-- click on sprite buttons
 		elseif event.element.tags.action == "tro_filter_list" then
 			local tag = event.element.tags
