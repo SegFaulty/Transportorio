@@ -458,7 +458,7 @@ script.on_event(defines.events.on_gui_click,
 			player_global.trades_menu:refresh_trades_list(player)
 
 		elseif event.element.name == "tro_tag_city" then
-			player.print("x" .. event.element.tags.text)
+			player.gui.screen["tro_trade_root_frame"]["tro_trades_list"]["city_"..event.element.tags.city_index]["header"]["tro_tag_city"].visible = false -- deactivate button -- not so nice way to do it
 			game.forces.player.add_chart_tag(game.surfaces[1], {position = event.element.tags.position, text = event.element.tags.text } )
 
 		-- click on sprite buttons
