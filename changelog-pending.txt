@@ -5,9 +5,12 @@ Date: 2022-06-16
 
 
   Changes:
+    - added city name  show in list, shown on map as tag, editable
     - hide trades in unrevealed map areas, assembler needs to be visible on the map
 
   GUI:
+    - added city name if groubed by city
+    - show index, direction and distance of the city from starting rocket-silo
     - add clear search string button, change back in search to button with icon
     - change stateless buttons group, traders, mall to stateful check box and switch
     - show correct product ratio (with probality) and merge same products
