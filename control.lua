@@ -1,6 +1,7 @@
 Search = require("data.Search")
 Search_history = require("data.Search_history")
 Trade_menu = require("scripts.gui")
+City_helper = require("scripts.city_helper")
 City = require("scripts.city_generation")
 
 DEBUG = true -- Used for debug, users should not enable
