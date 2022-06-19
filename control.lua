@@ -491,11 +491,19 @@ script.on_event(defines.events.on_gui_click,
 
 
 			for city_index, city in ipairs(global.cities) do
+
 				for x, assembler in ipairs(city.buildings.traders) do
-					exportTrade(file_name, city_index, assembler, 'trader')
+					-- hide trades in unrevealed map areas, assembler needs to be visible on the map,
+					local assembler_chunk_position = { math.floor(assembler.position.x / 32), math.floor(assembler.position.y / 32 )}
+					if game.forces.player.is_chunk_charted(game.surfaces[1], assembler_chunk_position) then
+						exportTrade(file_name, city_index, assembler, 'trader')
+					end
 				end
 				for x, assembler in ipairs(city.buildings.malls) do
-					exportTrade(file_name, city_index, assembler, 'mall')
+					local assembler_chunk_position = { math.floor(assembler.position.x / 32), math.floor(assembler.position.y / 32 )}
+					if game.forces.player.is_chunk_charted(game.surfaces[1], assembler_chunk_position) then
+						exportTrade(file_name, city_index, assembler, 'mall')
+					end
 				end
 			end
 
