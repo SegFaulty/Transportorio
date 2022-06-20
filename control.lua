@@ -470,7 +470,7 @@ script.on_event(defines.events.on_gui_click,
 			if event.button == 4 then -- right mouse button
 				player_global.trades_menu.filter.ingredients = true
 				player_global.trades_menu.filter.products = false
-				search = Search:new("any", "i"..tag.item_name, tag.type) -- disable filter magic, rely on search_string
+				search = Search:new("any", "i:"..tag.item_name, tag.type) -- disable filter magic, rely on search_string
 			elseif event.button == 2 then -- left mouse button
 				player_global.trades_menu.filter.products = true
 				player_global.trades_menu.filter.ingredients = false
