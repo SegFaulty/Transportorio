@@ -398,19 +398,22 @@ function Trades_menu:create_failed_search_message(list, player, search_term)
 	local horizontal_flow = message_element.add{type="flow", direction="horizontal"}
 
 	-- main text
-	if self.filter.products == true and self.filter.ingredients == true then
-		horizontal_flow.add{type="label", caption="No recipes found."}
-	elseif self.filter.products == true then
-		horizontal_flow.add{type="label", caption="No recipes create"}
-		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
-		horizontal_flow.add{type="label", caption=search_term}
-	elseif self.filter.ingredients == true then
-		horizontal_flow.add{type="label", caption="No recipes require"}
-		horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
-		horizontal_flow.add{type="label", caption=search_term}
-	else
-		horizontal_flow.add{type="label", caption="Unknown filter!"}
-	end
+	--if self.filter.products == true and self.filter.ingredients == true then
+	--	horizontal_flow.add{type="label", caption="No recipes found."}
+	--elseif self.filter.products == true then
+	--	horizontal_flow.add{type="label", caption="No recipes create"}
+	--	horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
+	--	horizontal_flow.add{type="label", caption=search_term}
+	--elseif self.filter.ingredients == true then
+	--	horizontal_flow.add{type="label", caption="No recipes require"}
+	--	horizontal_flow.add{type="sprite", sprite=search_history[1].item_type .. "/" .. search_history[1].searched_item}
+	--	horizontal_flow.add{type="label", caption=search_term}
+	--else
+	--	horizontal_flow.add{type="label", caption="Unknown filter!"}
+	--end
+
+	horizontal_flow.add{type="label", caption="No Deals found."}
+
 
 	-- ending text
 	if #search_history > 0 then
