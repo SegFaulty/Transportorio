@@ -131,6 +131,7 @@ end
 
 -- closes gui and resets search history
 function Trades_menu:close(player)
+	self:save_search(player)
 	player.set_shortcut_toggled("trades", not self.active)
 	self:destroy(player)
 	self.search_history:reset()
@@ -138,6 +139,7 @@ end
 
 -- closes gui without reseting search history
 function Trades_menu:minimize(player)
+	self:save_search(player)
 	player.set_shortcut_toggled("trades", not self.active)
 	self:destroy(player)
 end
@@ -166,6 +168,12 @@ function Trades_menu:update_search_text(player, search, filter)
 	end
 
 	textfield.text = text
+end
+
+function Trades_menu:save_search(player)
+	local text_field = player.gui.screen["tro_trade_root_frame"]["tro_filter_bar"]["tro_trade_menu_search"]
+	local current_search = convert_search_text_to_search_object(text_field.text)
+	self.search_history:add_search(current_search)
 end
 
 -- recreate the trades list
@@ -232,56 +240,64 @@ function Trades_menu:create_title_bar(root_element)
 end
 
 -- check an assemblers current recipe for an item. The filter decides whether to check the ingredients, products, or both.
-function Trades_menu:check_assembler_recipe_for_item(assembler, item_name, filter)
+function Trades_menu:check_assembler_recipe_for_item(assembler, search_query, filter)
 
-    -- hide trades in unrevealed map areas, assembler needs to be visible on the map,
+	-- skip empty assembler
+	local recipe = assembler.get_recipe()
+	if recipe == nil then -- prevent /scripts/gui.lua:253: attempt to index local 'recipe' (a nil value)
+		return false
+	end
+
+	-- hide trades in unrevealed map areas, assembler needs to be visible on the map,
     -- prevents trades in new generated chunks are in the list before the machines are visible or explored
     local assembler_chunk_position = { math.floor(assembler.position.x / 32), math.floor(assembler.position.y / 32 )}
     if not game.forces.player.is_chunk_charted(game.surfaces[1], assembler_chunk_position) then
-        return false
+		return  false
     end
 
-	-- check if searchterm item_name is a game item name then  filter for this item  else make a "item.name contains ..." search
-	local use_exact_match = false
-	if item_name ~= nil and game.item_prototypes[item_name] ~= nil then
-		use_exact_match = true
-	end
+	local search_result = true
 
-	local recipe = assembler.get_recipe()
-	if recipe == nil then -- orevent /scripts/gui.lua:253: attempt to index local 'recipe' (a nil value)
-		return false
-	end
-	-- check if the recipe has the item as a product
-	if self.filter.products == false then goto ingredient end -- skip product search
-	for i, product in ipairs(recipe.products) do
-		if use_exact_match then
-			if item_name == product.name then
-				return true
-			end
-		else
-			if string.find(product.name, item_name, 0, true) then
-				return true
+	-- for each searchterm
+	for search_term in string.gmatch(search_query, "%S+") do
+
+		-- chech for ingredients or product filter
+		-- string.sub(item_name, 1, 1) == "P"
+		index_start, index_end = string.find(search_term, ":")
+		local side = nil
+		if index_end ~= nil then
+			side = string.sub(search_term, 1, index_end - 1)
+			search_term = string.sub(search_term, index_end + 1, -1)
+		end
+
+		local search_items = {}
+		if side==nil or side=="ingredients" or side=="i" then
+			for _, item in ipairs(recipe.ingredients) do
+				table.insert(search_items, item)
 			end
 		end
-	end
-
-	::ingredient::
-	-- check if the recipe has the item as an ingredient
-	if self.filter.ingredients == false then goto finish end -- skip ingredient search
-	for i, ingredient in ipairs(recipe.ingredients) do
-		if use_exact_match then
-			if item_name == ingredient.name then
-				return true
-			end
-		else
-			if string.find(ingredient.name, item_name, 0, true) then
-				return true
+		if side==nil or side=="products" or side=="p" then
+			for _, item in ipairs(recipe.products) do
+				table.insert(search_items, item)
 			end
 		end
+
+		search_term_result = false
+		for _, item in ipairs(search_items) do
+			if game.item_prototypes[search_term] ~= nil then -- check if searchterm item_name is a game item name then  filter for this item  else make a "item.name contains ..." search
+				if search_term == item.name then -- it exist an game item with this name so we make an exact match
+					search_term_result = true
+				end
+			else
+				if string.find(item.name, search_term, 0, true) then
+					search_term_result = true
+				end
+			end
+		end
+		search_result = search_result and search_term_result
+
 	end
 
-	::finish::
-	return false
+	return search_result
 end
 
 -- creates each trade row from the list of machines and a filter. then adds the rows onto the list

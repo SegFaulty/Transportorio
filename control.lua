@@ -380,17 +380,18 @@ end --end function
 function convert_search_text_to_search_object(text)
 	local filter = ""
 	local searched_item = text
-	index_start, index_end = string.find(text, ":")
-
-	-- parse text into data
-	if index_end == nil then -- no filter
+	-- deactivate all search magic, because we made it simpler
+	--index_start, index_end = string.find(text, ":")
+	--
+	---- parse text into data
+	--if index_end == nil then -- no filter
 		filter = "any"
-	else
-		filter = string.sub(text, 1, index_end - 1)
-		searched_item = string.sub(text, index_end + 1, -1)
-	end
-
-	searched_item = string.gsub(searched_item, " ", "-")
+	--else
+	--	filter = string.sub(text, 1, index_end - 1)
+	--	searched_item = string.sub(text, index_end + 1, -1)
+	--end
+	--
+	--searched_item = string.gsub(searched_item, " ", "-")
 
 	-- turn data into search obj
 	local search1 = Search:new(filter, searched_item)
