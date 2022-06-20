@@ -470,7 +470,8 @@ function Trades_menu:create_row(list, assembler, city_name)
 		for i, ingredient in ipairs(ingredients) do
 			trade_row_flow.add{
 				type="sprite-button",
-				sprite = ingredient.type .. "/" .. ingredient.name, 
+				sprite = ingredient.type .. "/" .. ingredient.name,
+				mouse_button_filter =  {'left','right','middle'},
 				tags={
 					action="tro_filter_list",
 					item_name=ingredient.name,
@@ -518,14 +519,15 @@ function Trades_menu:create_row(list, assembler, city_name)
         last_amount =  product_amount
         last_button = {
 			type="sprite-button",
-			sprite = product.type .. "/" .. product.name, 
+			sprite = product.type .. "/" .. product.name,
+			mouse_button_filter =  {'left','right','middle'},
 			tags={
 				action="tro_filter_list",
 				item_name=product.name,
 				filter="product", 
 				type=product.type
 			},
-			tooltip={"", {"tro.item_name"}, ": ", product.name, " | ", {"tro.trade_menu_item_sprite_button_instructions"}}
+			tooltip={"", {"tro.item_name"}, ": ", product.name, " |  ", {"tro.trade_menu_item_sprite_button_instructions"}}
 		}
 
 	end
